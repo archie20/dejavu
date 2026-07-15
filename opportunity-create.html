@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeJAVU — Opportunity Creation Flow</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&family=Work+Sans:wght@400;500&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --boundless-blue: #285F74;
+            --resilient-turquoise: #00A0AF;
+            --gritty-green: #BBD153;
+            --optimistic-ice: #C2EDF0;
+            --immersive-blue-black: #22404D;
+            --off-white: #EEF3F4;
+            --pure-white: #FFFFFF;
+            --danger-red: #D9534F;
+            --sidebar-w: 400px;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Work Sans', sans-serif;
+            background: var(--off-white);
+            color: var(--immersive-blue-black);
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 800;
+        }
+
+        /* ── Header ── */
+        header {
+            background: var(--immersive-blue-black);
+            color: var(--pure-white);
+            padding: 16px 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 4px solid var(--resilient-turquoise);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .header-left { display: flex; align-items: center; gap: 12px; }
+        header h1 { margin: 0; font-size: 1.15rem; }
+        header h1 span { color: var(--resilient-turquoise); }
+
+        .hint-pill {
+            font-size: 0.72rem;
+            font-weight: 600;
+            background: rgba(0, 160, 175, 0.25);
+            padding: 6px 14px;
+            border-radius: 20px;
+            color: var(--optimistic-ice);
+        }
+
+        /* ── Main canvas ── */
+        .canvas {
+            padding: 28px 20px 80px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .diagram-block {
+            background: var(--pure-white);
+            border-radius: 24px;
+            margin-bottom: 32px;
+            box-shadow: 0 8px 32px rgba(34, 64, 77, 0.08);
+            overflow: hidden;
+            position: relative;
+            padding-top: 36px;
+        }
+
+        .diagram-block::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--resilient-turquoise), var(--gritty-green));
+        }
+
+        .block-tag {
+            position: absolute;
+            top: 14px;
+            left: 20px;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 800;
+            font-size: 0.65rem;
+            letter-spacing: 0.08em;
+            color: var(--resilient-turquoise);
+            z-index: 2;
+        }
+
+        .diagram-svg {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+
+        /* Clickable nodes */
+        .click-node {
+            cursor: pointer;
+            transition: filter 0.2s, transform 0.2s;
+        }
+
+        .click-node:hover {
+            filter: brightness(1.06) drop-shadow(0 4px 12px rgba(0, 160, 175, 0.35));
+        }
+
+        .click-node.active {
+            filter: drop-shadow(0 0 0 3px var(--resilient-turquoise)) brightness(1.04);
+        }
+
+        .click-node .node-hint {
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .click-node:hover .node-hint {
+            opacity: 1;
+        }
+
+        /* ── Sidebar ── */
+        .sidebar-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(34, 64, 77, 0.45);
+            backdrop-filter: blur(3px);
+            z-index: 200;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        .sidebar-backdrop.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: var(--sidebar-w);
+            max-width: 92vw;
+            height: 100vh;
+            background: var(--pure-white);
+            z-index: 201;
+            transform: translateX(100%);
+            transition: transform 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+            display: flex;
+            flex-direction: column;
+            box-shadow: -8px 0 40px rgba(34, 64, 77, 0.15);
+        }
+
+        .sidebar.open {
+            transform: translateX(0);
+        }
+
+        .sidebar-header {
+            padding: 24px 24px 16px;
+            border-bottom: 1px solid var(--optimistic-ice);
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .sidebar-phase {
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            color: var(--resilient-turquoise);
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+
+        .sidebar-title {
+            margin: 0;
+            font-size: 1.2rem;
+            padding-right: 36px;
+        }
+
+        .sidebar-close {
+            position: absolute;
+            top: 20px;
+            right: 18px;
+            width: 36px;
+            height: 36px;
+            border: none;
+            background: var(--off-white);
+            border-radius: 50%;
+            font-size: 1.3rem;
+            line-height: 1;
+            cursor: pointer;
+            color: var(--immersive-blue-black);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .sidebar-close:hover {
+            background: var(--danger-red);
+            color: white;
+        }
+
+        .sidebar-body {
+            padding: 20px 24px 32px;
+            overflow-y: auto;
+            flex-grow: 1;
+            font-size: 0.92rem;
+            line-height: 1.6;
+            color: #445;
+        }
+
+        .sidebar-body p { margin: 0 0 14px; }
+
+        .detail-list {
+            list-style: none;
+            margin: 0 0 16px;
+            padding: 0;
+        }
+
+        .detail-list li {
+            padding: 10px 14px;
+            background: var(--off-white);
+            border-radius: 8px;
+            margin-bottom: 8px;
+            font-size: 0.88rem;
+        }
+
+        .detail-list li strong {
+            display: block;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.82rem;
+            color: var(--immersive-blue-black);
+            margin-bottom: 2px;
+        }
+
+        .detail-list li span {
+            font-size: 0.8rem;
+            color: #667;
+        }
+
+        .roc-tag {
+            display: inline-block;
+            font-size: 0.65rem;
+            font-weight: 700;
+            background: rgba(40, 95, 116, 0.12);
+            color: var(--boundless-blue);
+            padding: 2px 7px;
+            border-radius: 3px;
+            border: 1px dashed var(--boundless-blue);
+            margin-left: 6px;
+            vertical-align: middle;
+        }
+
+        .flow-steps {
+            counter-reset: step;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .flow-steps li {
+            counter-increment: step;
+            padding: 12px 12px 12px 44px;
+            position: relative;
+            margin-bottom: 10px;
+            background: var(--off-white);
+            border-radius: 10px;
+            border-left: 3px solid var(--resilient-turquoise);
+        }
+
+        .flow-steps li::before {
+            content: counter(step);
+            position: absolute;
+            left: 12px;
+            top: 12px;
+            width: 22px;
+            height: 22px;
+            background: var(--resilient-turquoise);
+            color: white;
+            border-radius: 50%;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 800;
+            font-size: 0.7rem;
+            text-align: center;
+            line-height: 22px;
+        }
+
+        .status-pill {
+            display: inline-block;
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 4px;
+            margin-top: 6px;
+        }
+
+        .status-pill.pass { background: rgba(187, 209, 83, 0.3); color: #4a5a10; }
+        .status-pill.fail { background: rgba(217, 83, 79, 0.15); color: var(--danger-red); }
+        .status-pill.pending { background: var(--optimistic-ice); color: var(--boundless-blue); }
+
+        .formula-box {
+            background: var(--immersive-blue-black);
+            color: white;
+            border-radius: 10px;
+            padding: 16px;
+            text-align: center;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.88rem;
+            margin: 14px 0;
+        }
+
+        .formula-box em {
+            color: var(--resilient-turquoise);
+            font-style: normal;
+            font-weight: 800;
+        }
+
+        .pill-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin: 10px 0 14px;
+        }
+
+        .pill {
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 20px;
+            background: white;
+            border: 1px solid var(--optimistic-ice);
+        }
+
+        @media (max-width: 600px) {
+            .hint-pill { display: none; }
+            header h1 { font-size: 1rem; }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div class="header-left">
+            <svg width="36" height="36" viewBox="0 0 100 100" aria-hidden="true">
+                <polygon points="50,5 95,50 50,95 5,50" fill="#00A0AF" />
+                <polygon points="50,5 72.5,27.5 50,50 27.5,27.5" fill="#285F74" opacity="0.8" />
+            </svg>
+            <h1>DeJAVU <span>Opportunity Flow</span></h1>
+        </div>
+        <span class="hint-pill">Click any node for details →</span>
+    </header>
+
+    <main class="canvas">
+
+        <!-- ═══ MASTER LIFECYCLE ═══ -->
+        <section class="diagram-block">
+            <span class="block-tag">LIFECYCLE</span>
+            <svg class="diagram-svg" viewBox="0 0 900 210" xmlns="http://www.w3.org/2000/svg">
+                <rect width="900" height="210" fill="#FAFCFC" />
+                <defs>
+                    <marker id="a1" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto">
+                        <path d="M0,0 L0,6 L7,3 z" fill="#285F74" />
+                    </marker>
+                </defs>
+
+                <!-- Pipeline track -->
+                <line x1="90" y1="88" x2="810" y2="88" stroke="#C2EDF0" stroke-width="6" stroke-linecap="round" />
+
+                <!-- Node helper: centers at 90, 234, 378, 522, 666, 810 -->
+                <g class="click-node" data-panel="define">
+                    <circle cx="90" cy="88" r="36" fill="#285F74" stroke="#00A0AF" stroke-width="3" />
+                    <text x="90" y="84" text-anchor="middle" font-size="20">📋</text>
+                    <text x="90" y="140" text-anchor="middle" fill="#22404D" font-family="Montserrat,sans-serif"
+                        font-weight="800" font-size="10">DEFINE</text>
+                    <text x="90" y="154" text-anchor="middle" fill="#667" font-family="Work Sans,sans-serif"
+                        font-size="9">Phase 1 Fields</text>
+                </g>
+
+                <g class="click-node" data-panel="gating">
+                    <circle cx="234" cy="88" r="36" fill="#00A0AF" stroke="#C2EDF0" stroke-width="3" />
+                    <text x="234" y="84" text-anchor="middle" font-size="20">🛡️</text>
+                    <text x="234" y="140" text-anchor="middle" fill="#22404D" font-family="Montserrat,sans-serif"
+                        font-weight="800" font-size="10">GATE</text>
+                    <text x="234" y="154" text-anchor="middle" fill="#667" font-family="Work Sans,sans-serif"
+                        font-size="9">Qualifications</text>
+                </g>
+
+                <g class="click-node" data-panel="routing">
+                    <circle cx="378" cy="88" r="36" fill="#285F74" stroke="#00A0AF" stroke-width="3" />
+                    <text x="378" y="84" text-anchor="middle" font-size="20">⚡</text>
+                    <text x="378" y="140" text-anchor="middle" fill="#22404D" font-family="Montserrat,sans-serif"
+                        font-weight="800" font-size="10">ROUTE</text>
+                    <text x="378" y="154" text-anchor="middle" fill="#667" font-family="Work Sans,sans-serif"
+                        font-size="9">Acceptance</text>
+                </g>
+
+                <g class="click-node" data-panel="scheduled">
+                    <circle cx="522" cy="88" r="36" fill="#00A0AF" stroke="#C2EDF0" stroke-width="3" />
+                    <text x="522" y="84" text-anchor="middle" font-size="20">📅</text>
+                    <text x="522" y="140" text-anchor="middle" fill="#22404D" font-family="Montserrat,sans-serif"
+                        font-weight="800" font-size="10">ASSIGN</text>
+                    <text x="522" y="154" text-anchor="middle" fill="#667" font-family="Work Sans,sans-serif"
+                        font-size="9">Scheduled</text>
+                </g>
+
+                <g class="click-node" data-panel="delivery">
+                    <circle cx="666" cy="88" r="36" fill="#285F74" stroke="#00A0AF" stroke-width="3" />
+                    <text x="666" y="84" text-anchor="middle" font-size="20">🎯</text>
+                    <text x="666" y="140" text-anchor="middle" fill="#22404D" font-family="Montserrat,sans-serif"
+                        font-weight="800" font-size="10">DELIVER</text>
+                    <text x="666" y="154" text-anchor="middle" fill="#667" font-family="Work Sans,sans-serif"
+                        font-size="9">Log Hours</text>
+                </g>
+
+                <g class="click-node" data-panel="merl">
+                    <circle cx="810" cy="88" r="36" fill="#BBD153" stroke="#285F74" stroke-width="3" />
+                    <text x="810" y="84" text-anchor="middle" font-size="20">📊</text>
+                    <text x="810" y="140" text-anchor="middle" fill="#22404D" font-family="Montserrat,sans-serif"
+                        font-weight="800" font-size="10">VALIDATE</text>
+                    <text x="810" y="154" text-anchor="middle" fill="#667" font-family="Work Sans,sans-serif"
+                        font-size="9">80% Rule</text>
+                </g>
+
+                <!-- Arrows -->
+                <line x1="126" y1="88" x2="198" y2="88" stroke="#285F74" stroke-width="2" marker-end="url(#a1)" />
+                <line x1="270" y1="88" x2="342" y2="88" stroke="#285F74" stroke-width="2" marker-end="url(#a1)" />
+                <line x1="414" y1="88" x2="486" y2="88" stroke="#285F74" stroke-width="2" marker-end="url(#a1)" />
+                <line x1="558" y1="88" x2="630" y2="88" stroke="#285F74" stroke-width="2" marker-end="url(#a1)" />
+                <line x1="702" y1="88" x2="774" y2="88" stroke="#285F74" stroke-width="2" marker-end="url(#a1)" />
+
+                <!-- Block branch -->
+                <g class="click-node" data-panel="blocked">
+                    <line x1="234" y1="124" x2="234" y2="168" stroke="#D9534F" stroke-width="2" stroke-dasharray="4,3" />
+                    <rect x="174" y="168" width="120" height="28" rx="6" fill="rgba(217,83,79,0.1)" stroke="#D9534F"
+                        stroke-width="1.5" />
+                    <text x="234" y="187" text-anchor="middle" fill="#D9534F" font-family="Work Sans,sans-serif"
+                        font-weight="600" font-size="10">✕ Blocked</text>
+                </g>
+
+                <!-- Certificate branch -->
+                <g class="click-node" data-panel="certificate">
+                    <line x1="810" y1="124" x2="810" y2="168" stroke="#BBD153" stroke-width="2" />
+                    <rect x="750" y="168" width="120" height="28" rx="6" fill="rgba(187,209,83,0.25)" stroke="#BBD153"
+                        stroke-width="2" />
+                    <text x="810" y="187" text-anchor="middle" fill="#4a5a10" font-family="Work Sans,sans-serif"
+                        font-weight="700" font-size="10">✓ Certificate</text>
+                </g>
+            </svg>
+        </section>
+
+        <!-- ═══ PHASE 1 FIELDS (visual form mockup) ═══ -->
+        <section class="diagram-block">
+            <span class="block-tag">PHASE 1 · DEFINE</span>
+            <svg class="diagram-svg" viewBox="0 0 900 330" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <marker id="a1b" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto">
+                        <path d="M0,0 L0,6 L7,3 z" fill="#00A0AF" />
+                    </marker>
+                </defs>
+                <rect width="900" height="330" fill="#FAFCFC" />
+
+                <!-- Left illustration -->
+                <g transform="translate(55,75)" opacity="0.9">
+                    <rect x="0" y="0" width="130" height="180" rx="12" fill="#C2EDF0" />
+                    <rect x="15" y="20" width="100" height="8" rx="4" fill="white" />
+                    <rect x="15" y="38" width="70" height="8" rx="4" fill="white" />
+                    <rect x="15" y="56" width="90" height="8" rx="4" fill="white" />
+                    <rect x="15" y="90" width="100" height="60" rx="8" fill="rgba(0,160,175,0.3)" />
+                    <text x="65" y="125" text-anchor="middle" fill="#285F74" font-family="Montserrat,sans-serif"
+                        font-weight="800" font-size="11">Better Impact</text>
+                    <text x="65" y="142" text-anchor="middle" fill="#285F74" font-family="Work Sans,sans-serif"
+                        font-size="9">Activity → Opportunity</text>
+                </g>
+                <line x1="185" y1="165" x2="218" y2="165" stroke="#00A0AF" stroke-width="2" marker-end="url(#a1b)" />
+
+                <!-- Form card -->
+                <rect x="220" y="30" width="400" height="270" rx="16" fill="white" stroke="#C2EDF0" stroke-width="2"
+                    filter="drop-shadow(0 4px 12px rgba(34,64,77,0.06))" />
+
+                <g class="click-node" data-panel="field-title">
+                    <rect x="245" y="50" width="350" height="38" rx="6" fill="#EEF3F4" stroke="#C2EDF0" stroke-width="1.5" />
+                    <text x="260" y="74" fill="#999" font-family="Work Sans,sans-serif" font-size="11">Opportunity Title</text>
+                </g>
+
+                <g class="click-node" data-panel="field-category">
+                    <rect x="245" y="100" width="168" height="44" rx="6" fill="rgba(40,95,116,0.06)" stroke="#285F74"
+                        stroke-width="2" stroke-dasharray="4,2" />
+                    <text x="260" y="118" fill="#285F74" font-family="Montserrat,sans-serif" font-weight="700"
+                        font-size="9">L1 CATEGORY</text>
+                    <text x="260" y="134" fill="#285F74" font-family="Work Sans,sans-serif" font-size="10">Entrepreneurship ▾</text>
+                    <text x="390" y="118" fill="#285F74" font-family="Work Sans,sans-serif" font-size="8">🔒 ROC</text>
+                </g>
+
+                <g class="click-node" data-panel="field-program">
+                    <rect x="427" y="100" width="168" height="44" rx="6" fill="rgba(40,95,116,0.06)" stroke="#285F74"
+                        stroke-width="2" stroke-dasharray="4,2" />
+                    <text x="442" y="118" fill="#285F74" font-family="Montserrat,sans-serif" font-weight="700"
+                        font-size="9">L2 PROGRAM TAG</text>
+                    <text x="442" y="134" fill="#285F74" font-family="Work Sans,sans-serif" font-size="10">Company Program ▾</text>
+                </g>
+
+                <g class="click-node" data-panel="field-delivery">
+                    <rect x="245" y="156" width="168" height="38" rx="6" fill="#EEF3F4" stroke="#C2EDF0" stroke-width="1.5" />
+                    <text x="260" y="172" fill="#999" font-family="Work Sans,sans-serif" font-size="9">DELIVERY MODE</text>
+                    <text x="260" y="186" fill="#667" font-family="Work Sans,sans-serif" font-size="11">In-Person ▾</text>
+                </g>
+
+                <g class="click-node" data-panel="field-schedule">
+                    <rect x="427" y="156" width="168" height="38" rx="6" fill="#EEF3F4" stroke="#C2EDF0" stroke-width="1.5" />
+                    <text x="442" y="172" fill="#999" font-family="Work Sans,sans-serif" font-size="9">SCHEDULE TYPE</text>
+                    <text x="442" y="186" fill="#667" font-family="Work Sans,sans-serif" font-size="11">One-Time ▾</text>
+                </g>
+
+                <g class="click-node" data-panel="field-dates">
+                    <rect x="245" y="206" width="168" height="38" rx="6" fill="#EEF3F4" stroke="#C2EDF0" stroke-width="1.5" />
+                    <text x="260" y="222" fill="#999" font-family="Work Sans,sans-serif" font-size="9">START DATE</text>
+                    <text x="260" y="236" fill="#667" font-family="Work Sans,sans-serif" font-size="10">📅 2026-08-01</text>
+                </g>
+
+                <g class="click-node" data-panel="field-dates">
+                    <rect x="427" y="206" width="168" height="38" rx="6" fill="#EEF3F4" stroke="#C2EDF0" stroke-width="1.5" />
+                    <text x="442" y="222" fill="#999" font-family="Work Sans,sans-serif" font-size="9">END DATE</text>
+                    <text x="442" y="236" fill="#667" font-family="Work Sans,sans-serif" font-size="10">📅 2026-12-15</text>
+                </g>
+
+                <g class="click-node" data-panel="field-hours">
+                    <rect x="245" y="256" width="168" height="34" rx="6" fill="#EEF3F4" stroke="#00A0AF" stroke-width="2" />
+                    <text x="260" y="272" fill="#00A0AF" font-family="Montserrat,sans-serif" font-weight="800"
+                        font-size="16">20 hrs</text>
+                    <text x="260" y="284" fill="#667" font-family="Work Sans,sans-serif" font-size="8">Committed Hours</text>
+                </g>
+
+                <g class="click-node" data-panel="field-capacity">
+                    <rect x="427" y="256" width="168" height="34" rx="6" fill="#EEF3F4" stroke="#C2EDF0" stroke-width="1.5" />
+                    <text x="442" y="272" fill="#22404D" font-family="Montserrat,sans-serif" font-weight="800"
+                        font-size="16">10</text>
+                    <text x="442" y="284" fill="#667" font-family="Work Sans,sans-serif" font-size="8">Capacity Limit</text>
+                </g>
+
+                <!-- Right help node -->
+                <g class="click-node" data-panel="define">
+                    <circle cx="715" cy="165" r="42" fill="#285F74" stroke="#00A0AF" stroke-width="3" />
+                    <text x="715" y="161" text-anchor="middle" fill="white" font-size="22">?</text>
+                    <text x="715" y="178" text-anchor="middle" fill="#C2EDF0" font-family="Montserrat,sans-serif"
+                        font-weight="800" font-size="8">ALL FIELDS</text>
+                </g>
+                <line x1="620" y1="165" x2="673" y2="165" stroke="#00A0AF" stroke-width="2" marker-end="url(#a1b)" />
+            </svg>
+        </section>
+
+        <!-- ═══ GATING FLOWCHART ═══ -->
+        <section class="diagram-block">
+            <span class="block-tag">PHASE 2 · VETTING</span>
+            <svg class="diagram-svg" viewBox="0 0 900 370" xmlns="http://www.w3.org/2000/svg">
+                <rect width="900" height="370" fill="#FAFCFC" />
+                <defs>
+                    <marker id="ag" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                        <path d="M0,0 L0,6 L8,3 z" fill="#00A0AF" />
+                    </marker>
+                    <marker id="agR" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                        <path d="M0,0 L0,6 L8,3 z" fill="#D9534F" />
+                    </marker>
+                    <marker id="agG" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                        <path d="M0,0 L0,6 L8,3 z" fill="#BBD153" />
+                    </marker>
+                </defs>
+
+                <!-- Volunteer -->
+                <g class="click-node" data-panel="gating">
+                    <rect x="355" y="20" width="190" height="44" rx="22" fill="#22404D" />
+                    <circle cx="385" cy="42" r="12" fill="#00A0AF" />
+                    <text x="470" y="47" text-anchor="middle" fill="white" font-family="Montserrat,sans-serif"
+                        font-weight="800" font-size="12">Volunteer Registers</text>
+                </g>
+
+                <line x1="450" y1="64" x2="450" y2="88" stroke="#00A0AF" stroke-width="2" marker-end="url(#ag)" />
+
+                <!-- Gates: centers 200, 450, 700 -->
+                <g class="click-node" data-panel="gate-onboard">
+                    <rect x="100" y="92" width="200" height="68" rx="14" fill="#EEF3F4" stroke="#285F74" stroke-width="2.5" />
+                    <circle cx="135" cy="126" r="22" fill="#285F74" />
+                    <text x="135" y="132" text-anchor="middle" fill="white" font-family="Montserrat,sans-serif"
+                        font-weight="800" font-size="14">1</text>
+                    <text x="215" y="120" text-anchor="middle" fill="#22404D" font-family="Montserrat,sans-serif"
+                        font-weight="800" font-size="12">Onboarding</text>
+                    <text x="215" y="138" text-anchor="middle" fill="#667" font-family="Work Sans,sans-serif"
+                        font-size="10">Completed?</text>
+                </g>
+
+                <g class="click-node" data-panel="gate-safeguard">
+                    <rect x="350" y="92" width="200" height="68" rx="14" fill="#EEF3F4" stroke="#285F74" stroke-width="2.5" />
+                    <circle cx="385" cy="126" r="22" fill="#285F74" />
+                    <text x="385" y="132" text-anchor="middle" fill="white" font-family="Montserrat,sans-serif"
+                        font-weight="800" font-size="14">2</text>
+                    <text x="465" y="120" text-anchor="middle" fill="#22404D" font-family="Montserrat,sans-serif"
+                        font-weight="800" font-size="12">Safeguarding</text>
+                    <text x="465" y="138" text-anchor="middle" fill="#667" font-family="Work Sans,sans-serif"
+                        font-size="10">Cleared?</text>
+                </g>
+
+                <g class="click-node" data-panel="gate-quiz">
+                    <rect x="600" y="92" width="200" height="68" rx="14" fill="#EEF3F4" stroke="#285F74" stroke-width="2.5" />
+                    <circle cx="635" cy="126" r="22" fill="#285F74" />
+                    <text x="635" y="132" text-anchor="middle" fill="white" font-family="Montserrat,sans-serif"
+                        font-weight="800" font-size="14">3</text>
+                    <text x="715" y="120" text-anchor="middle" fill="#22404D" font-family="Montserrat,sans-serif"
+                        font-weight="800" font-size="12">Domain Quiz</text>
+                    <text x="715" y="138" text-anchor="middle" fill="#667" font-family="Work Sans,sans-serif"
+                        font-size="10">Passed?</text>
+                </g>
+
+                <!-- Converge -->
+                <line x1="200" y1="160" x2="200" y2="188" stroke="#C2EDF0" stroke-width="2" />
+                <line x1="450" y1="160" x2="450" y2="188" stroke="#C2EDF0" stroke-width="2" />
+                <line x1="700" y1="160" x2="700" y2="188" stroke="#C2EDF0" stroke-width="2" />
+                <line x1="200" y1="188" x2="700" y2="188" stroke="#C2EDF0" stroke-width="2" />
+                <line x1="450" y1="188" x2="450" y2="212" stroke="#00A0AF" stroke-width="2" marker-end="url(#ag)" />
+
+                <!-- Decision diamond -->
+                <g class="click-node" data-panel="gating">
+                    <polygon points="450,212 505,247 450,282 395,247" fill="#00A0AF" />
+                    <text x="450" y="244" text-anchor="middle" fill="white" font-family="Montserrat,sans-serif"
+                        font-weight="800" font-size="11">All Passed?</text>
+                </g>
+
+                <!-- No → Block -->
+                <g class="click-node" data-panel="blocked">
+                    <line x1="395" y1="247" x2="200" y2="247" stroke="#D9534F" stroke-width="2.5"
+                        marker-end="url(#agR)" />
+                    <text x="300" y="238" text-anchor="middle" fill="#D9534F" font-family="Work Sans,sans-serif"
+                        font-weight="700" font-size="11">No</text>
+                    <line x1="200" y1="247" x2="200" y2="295" stroke="#D9534F" stroke-width="2" />
+                    <rect x="120" y="295" width="160" height="50" rx="12" fill="rgba(217,83,79,0.1)" stroke="#D9534F"
+                        stroke-width="2" />
+                    <text x="200" y="318" text-anchor="middle" fill="#D9534F" font-family="Montserrat,sans-serif"
+                        font-weight="800" font-size="12">Block Access</text>
+                    <text x="200" y="334" text-anchor="middle" fill="#D9534F" font-family="Work Sans,sans-serif"
+                        font-size="9">Complete credentials</text>
+                </g>
+
+                <!-- Yes → Unlock -->
+                <g class="click-node" data-panel="routing">
+                    <line x1="505" y1="247" x2="700" y2="247" stroke="#BBD153" stroke-width="2.5"
+                        marker-end="url(#agG)" />
+                    <text x="600" y="238" text-anchor="middle" fill="#5a6a18" font-family="Work Sans,sans-serif"
+                        font-weight="700" font-size="11">Yes</text>
+                    <line x1="700" y1="247" x2="700" y2="295" stroke="#BBD153" stroke-width="2" />
+                    <rect x="620" y="295" width="160" height="50" rx="12" fill="rgba(187,209,83,0.3)" stroke="#BBD153"
+                        stroke-width="2" />
+                    <text x="700" y="318" text-anchor="middle" fill="#4a5a10" font-family="Montserrat,sans-serif"
+                        font-weight="800" font-size="12">Unlock → Route</text>
+                    <text x="700" y="334" text-anchor="middle" fill="#667" font-family="Work Sans,sans-serif"
+                        font-size="9">Application enabled</text>
+                </g>
+            </svg>
+        </section>
+
+        <!-- ═══ ACCEPTANCE PATHWAYS ═══ -->
+        <section class="diagram-block">
+            <span class="block-tag">PHASE 3 · ROUTING</span>
+            <svg class="diagram-svg" viewBox="0 0 900 310" xmlns="http://www.w3.org/2000/svg">
+                <rect width="900" height="310" fill="#FAFCFC" />
+
+                <!-- Fork origin -->
+                <circle cx="450" cy="42" r="28" fill="#00A0AF" />
+                <text x="450" y="48" text-anchor="middle" fill="white" font-family="Montserrat,sans-serif"
+                    font-weight="800" font-size="11">Gates ✓</text>
+
+                <line x1="450" y1="70" x2="450" y2="88" stroke="#C2EDF0" stroke-width="3" />
+                <line x1="225" y1="88" x2="675" y2="88" stroke="#C2EDF0" stroke-width="3" />
+                <line x1="225" y1="88" x2="225" y2="108" stroke="#285F74" stroke-width="2" />
+                <line x1="675" y1="88" x2="675" y2="108" stroke="#BBD153" stroke-width="2" />
+
+                <!-- Manual path -->
+                <g class="click-node" data-panel="pathway-manual">
+                    <rect x="65" y="108" width="320" height="190" rx="16" fill="rgba(40,95,116,0.05)" stroke="#285F74" stroke-width="2.5" />
+                    <text x="225" y="134" text-anchor="middle" fill="#285F74" font-family="Montserrat,sans-serif"
+                        font-weight="800" font-size="13">Manual ROC Review</text>
+
+                    <circle cx="105" cy="168" r="16" fill="#285F74" />
+                    <text x="105" y="173" text-anchor="middle" fill="white" font-weight="800" font-size="11">1</text>
+                    <rect x="135" y="155" width="220" height="26" rx="6" fill="white" stroke="#C2EDF0" />
+                    <text x="245" y="173" text-anchor="middle" fill="#667" font-size="10">Volunteer Applies</text>
+
+                    <line x1="105" y1="184" x2="105" y2="198" stroke="#C2EDF0" stroke-width="2" />
+                    <circle cx="105" cy="213" r="16" fill="#285F74" />
+                    <text x="105" y="218" text-anchor="middle" fill="white" font-weight="800" font-size="11">2</text>
+                    <rect x="135" y="200" width="220" height="26" rx="6" fill="#C2EDF0" stroke="#00A0AF" />
+                    <text x="245" y="218" text-anchor="middle" fill="#285F74" font-weight="700" font-size="10">Pending Review</text>
+
+                    <line x1="105" y1="229" x2="105" y2="243" stroke="#C2EDF0" stroke-width="2" />
+                    <circle cx="105" cy="258" r="16" fill="#285F74" />
+                    <text x="105" y="263" text-anchor="middle" fill="white" font-weight="800" font-size="11">3</text>
+                    <rect x="135" y="245" width="220" height="26" rx="6" fill="white" stroke="#C2EDF0" />
+                    <text x="245" y="263" text-anchor="middle" fill="#667" font-size="10">Admin Accept / Assign</text>
+
+                    <rect x="175" y="278" width="100" height="22" rx="6" fill="rgba(187,209,83,0.35)" stroke="#BBD153" stroke-width="2" />
+                    <text x="225" y="293" text-anchor="middle" fill="#4a5a10" font-weight="800" font-size="10">Scheduled</text>
+                </g>
+
+                <!-- OR -->
+                <text x="450" y="210" text-anchor="middle" fill="#00A0AF" font-family="Montserrat,sans-serif"
+                    font-weight="800" font-size="16">OR</text>
+
+                <!-- Auto path -->
+                <g class="click-node" data-panel="pathway-auto">
+                    <rect x="515" y="108" width="320" height="190" rx="16" fill="rgba(187,209,83,0.08)" stroke="#BBD153" stroke-width="2.5" />
+                    <text x="675" y="134" text-anchor="middle" fill="#4a5a10" font-family="Montserrat,sans-serif"
+                        font-weight="800" font-size="13">Auto-Assign</text>
+
+                    <circle cx="555" cy="168" r="16" fill="#BBD153" />
+                    <text x="555" y="173" text-anchor="middle" fill="#22404D" font-weight="800" font-size="11">1</text>
+                    <rect x="585" y="155" width="220" height="26" rx="6" fill="white" stroke="#C2EDF0" />
+                    <text x="695" y="173" text-anchor="middle" fill="#667" font-size="10">Clicks Sign Up</text>
+
+                    <line x1="555" y1="184" x2="555" y2="198" stroke="#C2EDF0" stroke-width="2" />
+                    <circle cx="555" cy="213" r="16" fill="#BBD153" />
+                    <text x="555" y="218" text-anchor="middle" fill="#22404D" font-weight="800" font-size="11">2</text>
+                    <rect x="585" y="200" width="220" height="26" rx="6" fill="white" stroke="#C2EDF0" />
+                    <text x="695" y="218" text-anchor="middle" fill="#667" font-size="10">Qualification/Badge Check</text>
+
+                    <line x1="555" y1="229" x2="555" y2="243" stroke="#C2EDF0" stroke-width="2" />
+                    <circle cx="555" cy="258" r="16" fill="#BBD153" />
+                    <text x="555" y="263" text-anchor="middle" fill="#22404D" font-weight="800" font-size="11">3</text>
+                    <rect x="585" y="245" width="220" height="26" rx="6" fill="rgba(187,209,83,0.35)" stroke="#BBD153" stroke-width="2" />
+                    <text x="695" y="263" text-anchor="middle" fill="#4a5a10" font-weight="800" font-size="10">Instantly Scheduled/Accepted</text>
+
+                    <rect x="635" y="278" width="120" height="22" rx="6" fill="rgba(217,83,79,0.08)" stroke="#D9534F" stroke-width="1" />
+                    <text x="695" y="293" text-anchor="middle" fill="#D9534F" font-size="9">False badge → Blocked</text>
+                </g>
+            </svg>
+        </section>
+
+        <!-- ═══ M&E VALIDATION ═══ -->
+        <section class="diagram-block">
+            <span class="block-tag">PHASE 5 · M&amp;E</span>
+            <svg class="diagram-svg" viewBox="0 0 900 310" xmlns="http://www.w3.org/2000/svg">
+                <rect width="900" height="310" fill="#FAFCFC" />
+                <defs>
+                    <marker id="am" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto">
+                        <path d="M0,0 L0,6 L7,3 z" fill="#285F74" />
+                    </marker>
+                </defs>
+
+                <!-- Pipeline flows left → formula centered at x=450 -->
+                <g class="click-node" data-panel="delivery">
+                    <rect x="82" y="40" width="88" height="48" rx="10" fill="#285F74" />
+                    <text x="126" y="61" text-anchor="middle" fill="white" font-family="Montserrat,sans-serif"
+                        font-weight="700" font-size="11">Deliver</text>
+                    <text x="126" y="77" text-anchor="middle" fill="#C2EDF0" font-size="9">Sessions</text>
+                </g>
+                <line x1="170" y1="64" x2="184" y2="64" stroke="#285F74" stroke-width="2" marker-end="url(#am)" />
+
+                <g class="click-node" data-panel="delivery">
+                    <rect x="186" y="40" width="88" height="48" rx="10" fill="#00A0AF" />
+                    <text x="230" y="61" text-anchor="middle" fill="white" font-family="Montserrat,sans-serif"
+                        font-weight="700" font-size="11">Log</text>
+                    <text x="230" y="77" text-anchor="middle" fill="#C2EDF0" font-size="9">Hours</text>
+                </g>
+                <line x1="274" y1="64" x2="288" y2="64" stroke="#285F74" stroke-width="2" marker-end="url(#am)" />
+
+                <g class="click-node" data-panel="delivery">
+                    <rect x="290" y="40" width="88" height="48" rx="10" fill="#00A0AF" />
+                    <text x="334" y="61" text-anchor="middle" fill="white" font-family="Montserrat,sans-serif"
+                        font-weight="700" font-size="11">Approve</text>
+                    <text x="334" y="77" text-anchor="middle" fill="#C2EDF0" font-size="9">By M&amp;E</text>
+                </g>
+                <line x1="378" y1="64" x2="390" y2="64" stroke="#285F74" stroke-width="2" marker-end="url(#am)" />
+
+                <g class="click-node" data-panel="merl">
+                    <rect x="392" y="33" width="116" height="62" rx="12" fill="#22404D" stroke="#00A0AF" stroke-width="2" />
+                    <text x="450" y="55" text-anchor="middle" fill="#00A0AF" font-family="Montserrat,sans-serif"
+                        font-weight="800" font-size="11">Completion %</text>
+                    <text x="450" y="71" text-anchor="middle" fill="white" font-family="Work Sans,sans-serif"
+                        font-size="9">Approved ÷ Committed</text>
+                    <text x="450" y="85" text-anchor="middle" fill="white" font-family="Work Sans,sans-serif"
+                        font-size="9">× 100</text>
+                </g>
+
+                <!-- Fork from formula center -->
+                <line x1="450" y1="95" x2="450" y2="115" stroke="#C2EDF0" stroke-width="3" />
+                <line x1="225" y1="115" x2="675" y2="115" stroke="#C2EDF0" stroke-width="3" />
+                <line x1="225" y1="115" x2="225" y2="138" stroke="#BBD153" stroke-width="2" />
+                <line x1="675" y1="115" x2="675" y2="138" stroke="#D9534F" stroke-width="2" />
+
+                <!-- Success -->
+                <g class="click-node" data-panel="merl-success">
+                    <rect x="75" y="138" width="300" height="130" rx="16" fill="rgba(187,209,83,0.15)" stroke="#BBD153" stroke-width="3" />
+                    <text x="225" y="178" text-anchor="middle" fill="#4a5a10" font-family="Montserrat,sans-serif"
+                        font-weight="800" font-size="28">≥ 80%</text>
+                    <text x="225" y="206" text-anchor="middle" fill="#4a5a10" font-family="Montserrat,sans-serif"
+                        font-weight="800" font-size="13">Successful Participant</text>
+                    <rect x="200" y="222" width="50" height="35" rx="4" fill="white" stroke="#BBD153" stroke-width="2" />
+                    <circle cx="225" cy="232" r="8" fill="#BBD153" />
+                </g>
+
+                <!-- Fail -->
+                <g class="click-node" data-panel="merl-incomplete">
+                    <rect x="525" y="138" width="300" height="130" rx="16" fill="rgba(217,83,79,0.08)" stroke="#D9534F" stroke-width="3" />
+                    <text x="675" y="178" text-anchor="middle" fill="#D9534F" font-family="Montserrat,sans-serif"
+                        font-weight="800" font-size="28">&lt; 80%</text>
+                    <text x="675" y="206" text-anchor="middle" fill="#D9534F" font-family="Montserrat,sans-serif"
+                        font-weight="800" font-size="13">Incomplete Participation</text>
+                    <rect x="640" y="222" width="70" height="35" rx="4" fill="white" stroke="#D9534F" stroke-width="2" stroke-dasharray="4,3" />
+                </g>
+            </svg>
+        </section>
+
+    </main>
+
+    <!-- Sidebar -->
+    <div class="sidebar-backdrop" id="backdrop"></div>
+    <aside class="sidebar" id="sidebar" aria-hidden="true">
+        <div class="sidebar-header">
+            <div class="sidebar-phase" id="sb-phase"></div>
+            <h2 class="sidebar-title" id="sb-title"></h2>
+            <button class="sidebar-close" id="sidebar-close" aria-label="Close details">×</button>
+        </div>
+        <div class="sidebar-body" id="sb-body"></div>
+    </aside>
+
+    <script>
+        const panels = {
+            governance: {
+                phase: 'Governance',
+                title: 'ROC-and-Spoke Model',
+                body: `<p>JA Africa Regional Office (ROC) is the parent Better Impact account. Member countries operate as child sub-accounts under this hub.</p>
+                <ul class="detail-list">
+                    <li><strong>ROC (Parent)</strong><span>Owns and hard-locks master data: Global Categories, Program Tags, Custom Fields, and Qualification names.</span></li>
+                    <li><strong>Spoke (Child)</strong><span>Wave 1 countries — Nigeria and Rwanda — inherit ROC taxonomies. They cannot rename, create, or delete locked options.</span></li>
+                    <li><strong>Terminology</strong><span>All Better Impact "Activities" are treated as Volunteer Opportunities in DeJAVU.</span></li>
+                </ul>`
+            },
+            'spoke-nigeria': {
+                phase: 'Governance',
+                title: 'Nigeria · Wave 1 Spoke',
+                body: `<p>Child sub-account under JA Africa ROC. Inherits all ROC-locked taxonomies and qualification names.</p>
+                <ul class="detail-list">
+                    <li><strong>Configurable locally</strong><span>Delivery Mode, Schedule Type, dates, committed hours, and capacity limits.</span></li>
+                    <li><strong>Inherited from ROC</strong><span>Global Categories (L1), Program Tags (L2), and Qualification gate definitions.</span></li>
+                </ul>`
+            },
+            'spoke-rwanda': {
+                phase: 'Governance',
+                title: 'Rwanda · Wave 1 Spoke',
+                body: `<p>Child sub-account under JA Africa ROC. Inherits all ROC-locked taxonomies and qualification names.</p>
+                <ul class="detail-list">
+                    <li><strong>Configurable locally</strong><span>Delivery Mode, Schedule Type, dates, committed hours, and capacity limits.</span></li>
+                    <li><strong>Inherited from ROC</strong><span>Global Categories (L1), Program Tags (L2), and Qualification gate definitions.</span></li>
+                </ul>`
+            },
+            define: {
+                phase: 'Phase 1',
+                title: 'Opportunity Creation — Full Field Schema',
+                body: `<p>Required data structure when creating a new Volunteer Opportunity (Better Impact Activity).</p>
+                <ul class="detail-list">
+                    <li><strong>Opportunity Title</strong><span>Text, max 50 chars. Format: [Program Name] - [Role] - [Location]</span></li>
+                    <li><strong>Global Category (L1)</strong><span>Single-select. ROC Locked: Financial Literacy, Entrepreneurship, Work Readiness, Digital Literacy</span></li>
+                    <li><strong>Program Tag (L2)</strong><span>Multi-select. ROC Locked: Company Program, SEP, SET4LYF, 10MAG</span></li>
+                    <li><strong>Delivery Mode</strong><span>Online, In-Person, or Hybrid</span></li>
+                    <li><strong>Schedule Type</strong><span>Recurring Pattern, One-Time, or Ongoing (No Schedule)</span></li>
+                    <li><strong>Start / End Date</strong><span>Required unless Schedule Type is Ongoing</span></li>
+                    <li><strong>Committed Hours</strong><span>Numeric, must be &gt; 0. Drives M&amp;E participation % math.</span></li>
+                    <li><strong>Capacity Limit</strong><span>Maximum volunteers assignable to this opportunity.</span></li>
+                </ul>`
+            },
+            'field-title': {
+                phase: 'Phase 1',
+                title: 'Opportunity Title',
+                body: `<p><strong>Type:</strong> Text (max 50 characters)</p>
+                <p><strong>Convention:</strong> [Program Name] - [Role] - [Location]</p>
+                <p><strong>Example:</strong> Company Program - Business Advisor - Lagos</p>
+                <p><strong>Governance:</strong> Configurable at Spoke or ROC level.</p>`
+            },
+            'field-category': {
+                phase: 'Phase 1',
+                title: 'Global Category (L1)',
+                body: `<p><strong>Type:</strong> Single-select dropdown <span class="roc-tag">ROC LOCKED</span></p>
+                <div class="pill-row">
+                    <span class="pill">Financial Literacy</span>
+                    <span class="pill">Entrepreneurship</span>
+                    <span class="pill">Work Readiness</span>
+                    <span class="pill">Digital Literacy</span>
+                </div>
+                <p>Sub-accounts cannot rename, create, or delete these options. Ensures downstream reporting standards.</p>`
+            },
+            'field-program': {
+                phase: 'Phase 1',
+                title: 'Program Tag (L2)',
+                body: `<p><strong>Type:</strong> Multi-select tag <span class="roc-tag">ROC LOCKED</span></p>
+                <div class="pill-row">
+                    <span class="pill">Company Program</span>
+                    <span class="pill">SEP</span>
+                    <span class="pill">SET4LYF</span>
+                    <span class="pill">10MAG</span>
+                </div>
+                <p>Tags classify opportunities under specific JA Africa program initiatives.</p>`
+            },
+            'field-delivery': {
+                phase: 'Phase 1',
+                title: 'Delivery Mode',
+                body: `<p><strong>Type:</strong> Single-select dropdown</p>
+                <div class="pill-row"><span class="pill">Online</span><span class="pill">In-Person</span><span class="pill">Hybrid</span></div>
+                <p><strong>Governance:</strong> Configurable at Spoke or ROC level.</p>`
+            },
+            'field-schedule': {
+                phase: 'Phase 1',
+                title: 'Schedule Type',
+                body: `<p><strong>Type:</strong> Single-select dropdown</p>
+                <div class="pill-row"><span class="pill">Recurring Pattern</span><span class="pill">One-Time</span><span class="pill">Ongoing (No Schedule)</span></div>
+                <p>When set to Ongoing, Start/End dates are not required.</p>`
+            },
+            'field-dates': {
+                phase: 'Phase 1',
+                title: 'Start / End Date',
+                body: `<p><strong>Type:</strong> Date picker</p>
+                <p>Required for Recurring Pattern and One-Time schedules. Not required when Schedule Type is Ongoing (No Schedule).</p>`
+            },
+            'field-hours': {
+                phase: 'Phase 1',
+                title: 'Committed Hours',
+                body: `<p><strong>Type:</strong> Numeric — must be greater than 0</p>
+                <p>This value is the denominator in the MERL completion formula. Set at opportunity creation and used to evaluate whether a volunteer met the 80% participation threshold after delivery.</p>`
+            },
+            'field-capacity': {
+                phase: 'Phase 1',
+                title: 'Capacity Limit',
+                body: `<p><strong>Type:</strong> Numeric</p>
+                <p>Maximum number of volunteers permitted to be assigned to this opportunity. Once capacity is reached, the opportunity closes to new registrations.</p>`
+            },
+            gating: {
+                phase: 'Phase 2',
+                title: 'Vetting & Qualification Gating',
+                body: `<p>When a volunteer registers or self-schedules, the system checks their profile credentials against the opportunity's active gate requirements.</p>
+                <p>Only gates marked as required for this opportunity are evaluated. All active gates must pass to unlock application.</p>
+                <ul class="detail-list">
+                    <li><strong>Gate 1 — Onboarding</strong><span>DeJAVU general orientation checklist completed.</span></li>
+                    <li><strong>Gate 2 — Safeguarding</strong><span>Child safeguarding policy sign-off and risk review. Required for youth-interaction roles.</span></li>
+                    <li><strong>Gate 3 — Domain Quiz</strong><span>Skill validation (e.g., Financial Literacy Quiz Score) verified by regional M&amp;E team.</span></li>
+                </ul>
+                <p><strong>All passed?</strong> → Unlock application and proceed to acceptance routing.</p>
+                <p><strong>Any failed?</strong> → Block opportunity visibility/application. Volunteer redirected to complete missing credentials.</p>`
+            },
+            'gate-onboard': {
+                phase: 'Phase 2 · Gate 1',
+                title: 'Onboarding Completed',
+                body: `<p>Verification that the volunteer has completed the basic DeJAVU general orientation checklist.</p>
+                <p>This is the foundational gate — typically required for all opportunities. Without it, the volunteer cannot proceed to application regardless of other credentials.</p>`
+            },
+            'gate-safeguard': {
+                phase: 'Phase 2 · Gate 2',
+                title: 'Child Safeguarding Cleared',
+                body: `<p>Required for any opportunity involving youth interaction (e.g., Company Program Business Advisor roles).</p>
+                <p>Requires:</p>
+                <ul class="detail-list">
+                    <li><strong>Policy sign-off</strong><span>Volunteer has acknowledged and signed the child safeguarding policy.</span></li>
+                    <li><strong>Risk review</strong><span>Background and risk assessment completed by admin.</span></li>
+                </ul>`
+            },
+            'gate-quiz': {
+                phase: 'Phase 2 · Gate 3',
+                title: 'Domain-Specific Quiz Passed',
+                body: `<p>Skill validation check tied to the opportunity's Global Category. Examples:</p>
+                <div class="pill-row">
+                    <span class="pill">Financial Literacy Quiz</span>
+                    <span class="pill">Entrepreneurship Quiz</span>
+                    <span class="pill">Work Readiness Quiz</span>
+                </div>
+                <p>Quiz scores are to be verified by the team before the qualification badge is issued.</p>`
+            },
+            routing: {
+                phase: 'Phase 3',
+                title: 'Acceptance Pathway Routing',
+                body: `<p>Once a volunteer passes all active qualification gates and applies, their record is routed through one of two configured acceptance pathways.</p>
+                <ul class="detail-list">
+                    <li><strong>Pathway 1 — Manual ROC/Staff Review</strong><span>Phase 1 baseline. Admin manually verifies profile and assigns.</span></li>
+                    <li><strong>Pathway 2 — Auto-Assign</strong><span>Self-scheduling. Bypasses admin queue when all qualifications are verified.</span></li>
+                </ul>
+                <p>Click each pathway diagram for step-by-step detail.</p>`
+            },
+            'pathway-manual': {
+                phase: 'Phase 3 · Pathway 1',
+                title: 'Manual ROC/Staff Review',
+                body: `<ol class="flow-steps">
+                    <li>Volunteer registers/applies for the opportunity.</li>
+                    <li>Status set to <span class="status-pill pending">Pending Review (In-Process)</span></li>
+                    <li>System triggers alert to Spoke/ROC Admin.</li>
+                    <li>Admin manually verifies profile completeness and clicks Accept/Assign.</li>
+                    <li>Status changes to <span class="status-pill pass">Scheduled</span></li>
+                </ol>
+                <p>This is the Phase 1 baseline pathway. Used when human verification is required before assignment.</p>`
+            },
+            'pathway-auto': {
+                phase: 'Phase 3 · Pathway 2',
+                title: 'Auto-Assign (Self-Scheduling)',
+                body: `<ol class="flow-steps">
+                    <li>Volunteer clicks Sign Up for an open opportunity shift.</li>
+                    <li>System evaluates the volunteer's active qualification badges.</li>
+                    <li>If <strong>all</strong> required qualifications are True → status instantly changes to <span class="status-pill pass">Scheduled</span>. Admin queue bypassed.</li>
+                    <li>If <strong>any</strong> qualification is False → registration blocked. Volunteer redirected to complete missing credentials.</li>
+                </ol>`
+            },
+            scheduled: {
+                phase: 'Phase 4',
+                title: 'Scheduled — Volunteer Assigned',
+                body: `<p>Volunteer has been successfully assigned to the opportunity, either via manual admin approval or auto-assign.</p>
+                <p>At this stage the volunteer is active on the opportunity and can proceed to deliver sessions and log hours.</p>`
+            },
+            delivery: {
+                phase: 'Phase 4',
+                title: 'Delivery & Hour Logging',
+                body: `<p>After assignment, offline delivery sessions are conducted and hours are recorded in Better Impact.</p>
+                <ol class="flow-steps">
+                    <li>Sessions delivered in the field or online.</li>
+                    <li>Volunteer logs hours against the opportunity.</li>
+                    <li>Admin or M&amp;E team reviews and approves logged hours.</li>
+                    <li>Approved hours feed into the completion % calculation.</li>
+                </ol>`
+            },
+            merl: {
+                phase: 'Phase 5',
+                title: 'M&E Participation Validation',
+                body: `<p>After delivery, the system evaluates volunteer success using the MERL team's 80% completion rule.</p>
+                <div class="formula-box">Completion % = <em>(Approved Hours ÷ Committed Hours) × 100</em></div>
+                <p>Committed Hours are set at opportunity creation (Phase 1). Approved Hours are the total hours approved by admin/M&amp;E after delivery.</p>
+                <p>Click the outcome nodes in the diagram for pass/fail details.</p>`
+            },
+            'merl-success': {
+                phase: 'Phase 5 · Scenario A',
+                title: 'Successful Participant (≥ 80%)',
+                body: `<p><strong>Condition:</strong> Completion % is 80% or greater.</p>
+                <p><strong>Outcome:</strong> Volunteer status for this opportunity is marked as <span class="status-pill pass">Successful Participant</span>.</p>
+                <p><strong>Trigger:</strong> Valid Participation.</p>`
+            },
+            'merl-incomplete': {
+                phase: 'Phase 5 · Scenario B',
+                title: 'Incomplete Participation (< 80%)',
+                body: `<p><strong>Condition:</strong> Completion % is below 80%.</p>
+                <p><strong>Outcome:</strong> Volunteer status is marked as <span class="status-pill fail">Incomplete Participation</span>.</p>
+                <p><strong>Trigger:</strong> Flagged as incomplete</p>`
+            },
+            blocked: {
+                phase: 'Gate Failure',
+                title: 'Access Blocked',
+                body: `<p>When a volunteer fails one or more active qualification gates, the system:</p>
+                <ul class="detail-list">
+                    <li><strong>Blocks</strong><span>Opportunity visibility and application/self-schedule access.</span></li>
+                    <li><strong>Redirects</strong><span>Volunteer to complete missing credentials (onboarding, safeguarding, or domain quiz).</span></li>
+                </ul>
+                <p>Registration cannot proceed until all active gates return True.</p>`
+            },
+            certificate: {
+                phase: 'Outcome',
+                title: 'Digital Certificate Eligibility',
+                body: `<p>Regional digital certificates are generated only when a volunteer achieves <span class="status-pill pass">Successful Participant</span> status (≥ 80% completion).</p>
+                <p>Volunteers with <span class="status-pill fail">Incomplete Participation</span> are flagged in reports and cannot receive a certificate for that opportunity.</p>`
+            }
+        };
+
+        const sidebar = document.getElementById('sidebar');
+        const backdrop = document.getElementById('backdrop');
+        const sbPhase = document.getElementById('sb-phase');
+        const sbTitle = document.getElementById('sb-title');
+        const sbBody = document.getElementById('sb-body');
+        let activeNode = null;
+
+        function openPanel(id, skipHighlight) {
+            const data = panels[id];
+            if (!data) return;
+
+            if (!skipHighlight) {
+                if (activeNode) activeNode.classList.remove('active');
+                activeNode = document.querySelector(`[data-panel="${id}"]`);
+                if (activeNode) activeNode.classList.add('active');
+            }
+
+            sbPhase.textContent = data.phase;
+            sbTitle.textContent = data.title;
+            sbBody.innerHTML = data.body;
+
+            sidebar.classList.add('open');
+            backdrop.classList.add('open');
+            sidebar.setAttribute('aria-hidden', 'false');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closePanel() {
+            sidebar.classList.remove('open');
+            backdrop.classList.remove('open');
+            sidebar.setAttribute('aria-hidden', 'true');
+            document.body.style.overflow = '';
+            if (activeNode) {
+                activeNode.classList.remove('active');
+                activeNode = null;
+            }
+        }
+
+        document.querySelectorAll('.click-node').forEach(node => {
+            node.addEventListener('click', e => {
+                e.stopPropagation();
+                if (activeNode) activeNode.classList.remove('active');
+                activeNode = e.currentTarget;
+                activeNode.classList.add('active');
+                openPanel(node.dataset.panel, true);
+            });
+        });
+
+        document.getElementById('sidebar-close').addEventListener('click', closePanel);
+        backdrop.addEventListener('click', closePanel);
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') closePanel();
+        });
+    </script>
+
+</body>
+
+</html>
