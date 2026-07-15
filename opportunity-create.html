@@ -37,6 +37,12 @@
         }
 
         /* ── Header ── */
+        .top-bar {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
         header {
             background: var(--immersive-blue-black);
             color: var(--pure-white);
@@ -44,23 +50,73 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            border-bottom: 4px solid var(--resilient-turquoise);
-            position: sticky;
-            top: 0;
-            z-index: 50;
+            border-bottom: none;
         }
 
         .header-left { display: flex; align-items: center; gap: 12px; }
         header h1 { margin: 0; font-size: 1.15rem; }
         header h1 span { color: var(--resilient-turquoise); }
 
-        .hint-pill {
-            font-size: 0.72rem;
-            font-weight: 600;
-            background: rgba(0, 160, 175, 0.25);
-            padding: 6px 14px;
-            border-radius: 20px;
-            color: var(--optimistic-ice);
+        .pdf-btn {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            font-size: 0.78rem;
+            background: var(--resilient-turquoise);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 14px;
+            cursor: pointer;
+        }
+
+        .pdf-btn:hover { background: var(--gritty-green); color: var(--immersive-blue-black); }
+
+        #print-appendix { display: none; }
+
+        .hint-banner {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 12px 20px;
+            background: linear-gradient(90deg, var(--resilient-turquoise), #00B8C8);
+            color: var(--pure-white);
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            font-size: 0.88rem;
+            letter-spacing: 0.02em;
+            text-align: center;
+            border-bottom: 3px solid var(--gritty-green);
+            box-shadow: 0 4px 16px rgba(0, 160, 175, 0.35);
+            animation: hint-glow 2.5s ease-in-out infinite;
+        }
+
+        .hint-banner-icon {
+            font-size: 1.15rem;
+            line-height: 1;
+            animation: hint-bounce 1.8s ease-in-out infinite;
+        }
+
+        .hint-banner-text strong {
+            font-weight: 800;
+            text-decoration: underline;
+            text-underline-offset: 3px;
+        }
+
+        .hint-banner-arrow {
+            font-size: 1.1rem;
+            font-weight: 800;
+            opacity: 0.9;
+        }
+
+        @keyframes hint-glow {
+            0%, 100% { box-shadow: 0 4px 16px rgba(0, 160, 175, 0.35); }
+            50% { box-shadow: 0 4px 22px rgba(187, 209, 83, 0.45); }
+        }
+
+        @keyframes hint-bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-3px); }
         }
 
         /* ── Main canvas ── */
@@ -344,24 +400,44 @@
         }
 
         @media (max-width: 600px) {
-            .hint-pill { display: none; }
+            header { padding: 14px 16px; }
             header h1 { font-size: 1rem; }
+            .hint-banner {
+                font-size: 0.95rem;
+                padding: 14px 16px;
+                gap: 8px;
+            }
+            .hint-banner-icon { font-size: 1.3rem; }
+        }
+
+        @media print {
+            .top-bar, .sidebar, .sidebar-backdrop, .pdf-btn { display: none !important; }
+            #print-appendix { display: block; }
+            .diagram-block { break-inside: avoid; }
+            body { background: white; }
         }
     </style>
 </head>
 
 <body>
 
-    <header>
-        <div class="header-left">
-            <svg width="36" height="36" viewBox="0 0 100 100" aria-hidden="true">
-                <polygon points="50,5 95,50 50,95 5,50" fill="#00A0AF" />
-                <polygon points="50,5 72.5,27.5 50,50 27.5,27.5" fill="#285F74" opacity="0.8" />
-            </svg>
-            <h1>DeJAVU <span>Opportunity Flow</span></h1>
+    <div class="top-bar">
+        <header>
+            <div class="header-left">
+                <svg width="36" height="36" viewBox="0 0 100 100" aria-hidden="true">
+                    <polygon points="50,5 95,50 50,95 5,50" fill="#00A0AF" />
+                    <polygon points="50,5 72.5,27.5 50,50 27.5,27.5" fill="#285F74" opacity="0.8" />
+                </svg>
+                <h1>DeJAVU <span>Opportunity Flow</span></h1>
+            </div>
+            <button class="pdf-btn" onclick="downloadPdf()">↓ PDF</button>
+        </header>
+        <div class="hint-banner" role="note">
+            <span class="hint-banner-icon" aria-hidden="true">👆</span>
+            <span class="hint-banner-text"><strong>Tap any node</strong> to view details</span>
+            <span class="hint-banner-arrow" aria-hidden="true">→</span>
         </div>
-        <span class="hint-pill">Click any node for details →</span>
-    </header>
+    </div>
 
     <main class="canvas">
 
@@ -498,10 +574,12 @@
                 <g class="click-node" data-panel="field-category">
                     <rect x="245" y="100" width="168" height="44" rx="6" fill="rgba(40,95,116,0.06)" stroke="#285F74"
                         stroke-width="2" stroke-dasharray="4,2" />
-                    <text x="260" y="118" fill="#285F74" font-family="Montserrat,sans-serif" font-weight="700"
-                        font-size="9">L1 CATEGORY</text>
-                    <text x="260" y="134" fill="#285F74" font-family="Work Sans,sans-serif" font-size="10">Entrepreneurship ▾</text>
-                    <text x="390" y="118" fill="#285F74" font-family="Work Sans,sans-serif" font-size="8">🔒 ROC</text>
+                    <text x="260" y="114" fill="#285F74" font-family="Montserrat,sans-serif" font-weight="700"
+                        font-size="9">L1 CATEGORY · MULTI</text>
+                    <rect x="260" y="120" width="72" height="16" rx="8" fill="rgba(40,95,116,0.12)" stroke="#285F74" stroke-width="1" />
+                    <text x="296" y="131" text-anchor="middle" fill="#285F74" font-family="Work Sans,sans-serif" font-size="8">Entrepreneurship</text>
+                    <rect x="338" y="120" width="62" height="16" rx="8" fill="rgba(40,95,116,0.12)" stroke="#285F74" stroke-width="1" />
+                    <text x="369" y="131" text-anchor="middle" fill="#285F74" font-family="Work Sans,sans-serif" font-size="8">Work Readiness</text>
                 </g>
 
                 <g class="click-node" data-panel="field-program">
@@ -510,6 +588,7 @@
                     <text x="442" y="118" fill="#285F74" font-family="Montserrat,sans-serif" font-weight="700"
                         font-size="9">L2 PROGRAM TAG</text>
                     <text x="442" y="134" fill="#285F74" font-family="Work Sans,sans-serif" font-size="10">Company Program ▾</text>
+                    <text x="575" y="118" fill="#285F74" font-family="Work Sans,sans-serif" font-size="8">🔒 ROC</text>
                 </g>
 
                 <g class="click-node" data-panel="field-delivery">
@@ -744,82 +823,149 @@
             </svg>
         </section>
 
-        <!-- ═══ M&E VALIDATION ═══ -->
+        <!-- ═══ PHASE 4 — DELIVERY & HOUR LOGGING ═══ -->
         <section class="diagram-block">
-            <span class="block-tag">PHASE 5 · M&amp;E</span>
-            <svg class="diagram-svg" viewBox="0 0 900 310" xmlns="http://www.w3.org/2000/svg">
-                <rect width="900" height="310" fill="#FAFCFC" />
+            <span class="block-tag">PHASE 4 · DELIVER</span>
+            <svg class="diagram-svg" viewBox="0 0 900 300" xmlns="http://www.w3.org/2000/svg">
+                <rect width="900" height="300" fill="#FAFCFC" />
                 <defs>
-                    <marker id="am" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto">
+                    <marker id="a4" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto">
                         <path d="M0,0 L0,6 L7,3 z" fill="#285F74" />
                     </marker>
                 </defs>
 
-                <!-- Pipeline flows left → formula centered at x=450 -->
-                <g class="click-node" data-panel="delivery">
-                    <rect x="82" y="40" width="88" height="48" rx="10" fill="#285F74" />
-                    <text x="126" y="61" text-anchor="middle" fill="white" font-family="Montserrat,sans-serif"
-                        font-weight="700" font-size="11">Deliver</text>
-                    <text x="126" y="77" text-anchor="middle" fill="#C2EDF0" font-size="9">Sessions</text>
+                <!-- Entry from Phase 3 -->
+                <g class="click-node" data-panel="scheduled">
+                    <rect x="365" y="18" width="170" height="40" rx="20" fill="rgba(187,209,83,0.35)" stroke="#BBD153" stroke-width="2" />
+                    <text x="450" y="44" text-anchor="middle" fill="#4a5a10" font-family="Montserrat,sans-serif"
+                        font-weight="800" font-size="12">Scheduled · Volunteer Assigned</text>
                 </g>
-                <line x1="170" y1="64" x2="184" y2="64" stroke="#285F74" stroke-width="2" marker-end="url(#am)" />
+
+                <line x1="450" y1="58" x2="450" y2="78" stroke="#C2EDF0" stroke-width="3" />
+
+                <!-- Volunteer + Opportunity visual -->
+                <g class="click-node" data-panel="scheduled">
+                    <rect x="310" y="80" width="280" height="56" rx="14" fill="#EEF3F4" stroke="#00A0AF" stroke-width="2" />
+                    <circle cx="345" cy="108" r="18" fill="#00A0AF" />
+                    <text x="345" y="113" text-anchor="middle" fill="white" font-size="14">👤</text>
+                    <text x="455" y="104" text-anchor="middle" fill="#22404D" font-family="Montserrat,sans-serif"
+                        font-weight="800" font-size="11">Active Assignment</text>
+                    <text x="455" y="120" text-anchor="middle" fill="#667" font-family="Work Sans,sans-serif"
+                        font-size="9">Volunteer linked to opportunity shift</text>
+                </g>
+
+                <line x1="450" y1="136" x2="450" y2="156" stroke="#C2EDF0" stroke-width="3" />
+
+                <!-- Four-step delivery pipeline -->
+                <line x1="130" y1="188" x2="770" y2="188" stroke="#C2EDF0" stroke-width="5" stroke-linecap="round" />
+
+                <g class="click-node" data-panel="deliver-sessions">
+                    <circle cx="130" cy="188" r="34" fill="#285F74" stroke="#00A0AF" stroke-width="3" />
+                    <text x="130" y="184" text-anchor="middle" font-size="18">🎯</text>
+                    <text x="130" y="238" text-anchor="middle" fill="#22404D" font-family="Montserrat,sans-serif"
+                        font-weight="800" font-size="10">DELIVER</text>
+                    <text x="130" y="252" text-anchor="middle" fill="#667" font-family="Work Sans,sans-serif"
+                        font-size="9">Run Sessions</text>
+                </g>
+                <line x1="164" y1="188" x2="266" y2="188" stroke="#285F74" stroke-width="2" marker-end="url(#a4)" />
+
+                <g class="click-node" data-panel="log-hours">
+                    <circle cx="300" cy="188" r="34" fill="#00A0AF" stroke="#C2EDF0" stroke-width="3" />
+                    <text x="300" y="184" text-anchor="middle" font-size="18">📝</text>
+                    <text x="300" y="238" text-anchor="middle" fill="#22404D" font-family="Montserrat,sans-serif"
+                        font-weight="800" font-size="10">LOG</text>
+                    <text x="300" y="252" text-anchor="middle" fill="#667" font-family="Work Sans,sans-serif"
+                        font-size="9">Record Hours</text>
+                </g>
+                <line x1="334" y1="188" x2="436" y2="188" stroke="#285F74" stroke-width="2" marker-end="url(#a4)" />
+
+                <g class="click-node" data-panel="approve-hours">
+                    <circle cx="470" cy="188" r="34" fill="#285F74" stroke="#00A0AF" stroke-width="3" />
+                    <text x="470" y="184" text-anchor="middle" font-size="18">✅</text>
+                    <text x="470" y="238" text-anchor="middle" fill="#22404D" font-family="Montserrat,sans-serif"
+                        font-weight="800" font-size="10">APPROVE</text>
+                    <text x="470" y="252" text-anchor="middle" fill="#667" font-family="Work Sans,sans-serif"
+                        font-size="9">Admin / M&amp;E Review</text>
+                </g>
+                <line x1="504" y1="188" x2="606" y2="188" stroke="#285F74" stroke-width="2" marker-end="url(#a4)" />
 
                 <g class="click-node" data-panel="delivery">
-                    <rect x="186" y="40" width="88" height="48" rx="10" fill="#00A0AF" />
-                    <text x="230" y="61" text-anchor="middle" fill="white" font-family="Montserrat,sans-serif"
-                        font-weight="700" font-size="11">Log</text>
-                    <text x="230" y="77" text-anchor="middle" fill="#C2EDF0" font-size="9">Hours</text>
+                    <circle cx="640" cy="188" r="34" fill="#00A0AF" stroke="#C2EDF0" stroke-width="3" />
+                    <text x="640" y="184" text-anchor="middle" font-size="18">📊</text>
+                    <text x="640" y="238" text-anchor="middle" fill="#22404D" font-family="Montserrat,sans-serif"
+                        font-weight="800" font-size="10">READY</text>
+                    <text x="640" y="252" text-anchor="middle" fill="#667" font-family="Work Sans,sans-serif"
+                        font-size="9">Approved Hours</text>
                 </g>
-                <line x1="274" y1="64" x2="288" y2="64" stroke="#285F74" stroke-width="2" marker-end="url(#am)" />
+                <line x1="674" y1="188" x2="736" y2="188" stroke="#285F74" stroke-width="2" marker-end="url(#a4)" />
 
-                <g class="click-node" data-panel="delivery">
-                    <rect x="290" y="40" width="88" height="48" rx="10" fill="#00A0AF" />
-                    <text x="334" y="61" text-anchor="middle" fill="white" font-family="Montserrat,sans-serif"
-                        font-weight="700" font-size="11">Approve</text>
-                    <text x="334" y="77" text-anchor="middle" fill="#C2EDF0" font-size="9">By M&amp;E</text>
-                </g>
-                <line x1="378" y1="64" x2="390" y2="64" stroke="#285F74" stroke-width="2" marker-end="url(#am)" />
-
+                <!-- Handoff to Phase 5 -->
                 <g class="click-node" data-panel="merl">
-                    <rect x="392" y="33" width="116" height="62" rx="12" fill="#22404D" stroke="#00A0AF" stroke-width="2" />
-                    <text x="450" y="55" text-anchor="middle" fill="#00A0AF" font-family="Montserrat,sans-serif"
-                        font-weight="800" font-size="11">Completion %</text>
-                    <text x="450" y="71" text-anchor="middle" fill="white" font-family="Work Sans,sans-serif"
-                        font-size="9">Approved ÷ Committed</text>
-                    <text x="450" y="85" text-anchor="middle" fill="white" font-family="Work Sans,sans-serif"
-                        font-size="9">× 100</text>
+                    <rect x="738" y="168" width="64" height="40" rx="10" fill="#22404D" stroke="#00A0AF" stroke-width="2" />
+                    <text x="770" y="186" text-anchor="middle" fill="#00A0AF" font-family="Montserrat,sans-serif"
+                        font-weight="800" font-size="9">M&amp;E</text>
+                    <text x="770" y="200" text-anchor="middle" fill="white" font-family="Work Sans,sans-serif"
+                        font-size="8">Phase 5 →</text>
+                </g>
+            </svg>
+        </section>
+
+        <!-- ═══ M&E VALIDATION ═══ -->
+        <section class="diagram-block">
+            <span class="block-tag">PHASE 5 · M&amp;E</span>
+            <svg class="diagram-svg" viewBox="0 0 900 280" xmlns="http://www.w3.org/2000/svg">
+                <rect width="900" height="280" fill="#FAFCFC" />
+
+                <!-- Input from Phase 4 -->
+                <g class="click-node" data-panel="delivery">
+                    <rect x="355" y="16" width="190" height="36" rx="18" fill="#EEF3F4" stroke="#00A0AF" stroke-width="2" />
+                    <text x="450" y="39" text-anchor="middle" fill="#285F74" font-family="Montserrat,sans-serif"
+                        font-weight="700" font-size="11">Approved Hours from Phase 4</text>
+                </g>
+                <line x1="450" y1="52" x2="450" y2="68" stroke="#C2EDF0" stroke-width="2" />
+
+                <!-- Formula node -->
+                <g class="click-node" data-panel="merl">
+                    <rect x="342" y="70" width="216" height="68" rx="14" fill="#22404D" stroke="#00A0AF" stroke-width="2" />
+                    <text x="450" y="96" text-anchor="middle" fill="#00A0AF" font-family="Montserrat,sans-serif"
+                        font-weight="800" font-size="13">Completion %</text>
+                    <text x="450" y="116" text-anchor="middle" fill="white" font-family="Work Sans,sans-serif"
+                        font-size="10">(Approved Hours ÷ Committed Hours) × 100</text>
                 </g>
 
-                <!-- Fork from formula center -->
-                <line x1="450" y1="95" x2="450" y2="115" stroke="#C2EDF0" stroke-width="3" />
-                <line x1="225" y1="115" x2="675" y2="115" stroke="#C2EDF0" stroke-width="3" />
-                <line x1="225" y1="115" x2="225" y2="138" stroke="#BBD153" stroke-width="2" />
-                <line x1="675" y1="115" x2="675" y2="138" stroke="#D9534F" stroke-width="2" />
+                <!-- Fork -->
+                <line x1="450" y1="138" x2="450" y2="158" stroke="#C2EDF0" stroke-width="3" />
+                <line x1="225" y1="158" x2="675" y2="158" stroke="#C2EDF0" stroke-width="3" />
+                <line x1="225" y1="158" x2="225" y2="178" stroke="#BBD153" stroke-width="2" />
+                <line x1="675" y1="158" x2="675" y2="178" stroke="#D9534F" stroke-width="2" />
 
                 <!-- Success -->
                 <g class="click-node" data-panel="merl-success">
-                    <rect x="75" y="138" width="300" height="130" rx="16" fill="rgba(187,209,83,0.15)" stroke="#BBD153" stroke-width="3" />
-                    <text x="225" y="178" text-anchor="middle" fill="#4a5a10" font-family="Montserrat,sans-serif"
-                        font-weight="800" font-size="28">≥ 80%</text>
-                    <text x="225" y="206" text-anchor="middle" fill="#4a5a10" font-family="Montserrat,sans-serif"
-                        font-weight="800" font-size="13">Successful Participant</text>
-                    <rect x="200" y="222" width="50" height="35" rx="4" fill="white" stroke="#BBD153" stroke-width="2" />
-                    <circle cx="225" cy="232" r="8" fill="#BBD153" />
+                    <rect x="75" y="178" width="300" height="88" rx="16" fill="rgba(187,209,83,0.15)" stroke="#BBD153" stroke-width="3" />
+                    <text x="225" y="212" text-anchor="middle" fill="#4a5a10" font-family="Montserrat,sans-serif"
+                        font-weight="800" font-size="26">≥ 80%</text>
+                    <text x="225" y="238" text-anchor="middle" fill="#4a5a10" font-family="Montserrat,sans-serif"
+                        font-weight="800" font-size="12">Successful Participant</text>
+                    <text x="225" y="256" text-anchor="middle" fill="#667" font-family="Work Sans,sans-serif"
+                        font-size="9">Certificate eligible</text>
                 </g>
 
                 <!-- Fail -->
                 <g class="click-node" data-panel="merl-incomplete">
-                    <rect x="525" y="138" width="300" height="130" rx="16" fill="rgba(217,83,79,0.08)" stroke="#D9534F" stroke-width="3" />
-                    <text x="675" y="178" text-anchor="middle" fill="#D9534F" font-family="Montserrat,sans-serif"
-                        font-weight="800" font-size="28">&lt; 80%</text>
-                    <text x="675" y="206" text-anchor="middle" fill="#D9534F" font-family="Montserrat,sans-serif"
-                        font-weight="800" font-size="13">Incomplete Participation</text>
-                    <rect x="640" y="222" width="70" height="35" rx="4" fill="white" stroke="#D9534F" stroke-width="2" stroke-dasharray="4,3" />
+                    <rect x="525" y="178" width="300" height="88" rx="16" fill="rgba(217,83,79,0.08)" stroke="#D9534F" stroke-width="3" />
+                    <text x="675" y="212" text-anchor="middle" fill="#D9534F" font-family="Montserrat,sans-serif"
+                        font-weight="800" font-size="26">&lt; 80%</text>
+                    <text x="675" y="238" text-anchor="middle" fill="#D9534F" font-family="Montserrat,sans-serif"
+                        font-weight="800" font-size="12">Incomplete Participation</text>
+                    <text x="675" y="256" text-anchor="middle" fill="#667" font-family="Work Sans,sans-serif"
+                        font-size="9">Flagged · No certificate</text>
                 </g>
             </svg>
         </section>
 
     </main>
+
+    <div id="print-appendix"></div>
 
     <!-- Sidebar -->
     <div class="sidebar-backdrop" id="backdrop"></div>
@@ -868,8 +1014,8 @@
                 body: `<p>Required data structure when creating a new Volunteer Opportunity (Better Impact Activity).</p>
                 <ul class="detail-list">
                     <li><strong>Opportunity Title</strong><span>Text, max 50 chars. Format: [Program Name] - [Role] - [Location]</span></li>
-                    <li><strong>Global Category (L1)</strong><span>Single-select. ROC Locked: Financial Literacy, Entrepreneurship, Work Readiness, Digital Literacy</span></li>
-                    <li><strong>Program Tag (L2)</strong><span>Multi-select. ROC Locked: Company Program, SEP, SET4LYF, 10MAG</span></li>
+                    <li><strong>Global Category (L1)</strong><span>Multi-select. ROC Locked: Financial Literacy, Entrepreneurship, Work Readiness, Digital Literacy</span></li>
+                    <li><strong>Program Tag (L2)</strong><span>Single-select. ROC Locked: Company Program, SEP, SET4LYF, 10MAG</span></li>
                     <li><strong>Delivery Mode</strong><span>Online, In-Person, or Hybrid</span></li>
                     <li><strong>Schedule Type</strong><span>Recurring Pattern, One-Time, or Ongoing (No Schedule)</span></li>
                     <li><strong>Start / End Date</strong><span>Required unless Schedule Type is Ongoing</span></li>
@@ -888,26 +1034,26 @@
             'field-category': {
                 phase: 'Phase 1',
                 title: 'Global Category (L1)',
-                body: `<p><strong>Type:</strong> Single-select dropdown <span class="roc-tag">ROC LOCKED</span></p>
+                body: `<p><strong>Type:</strong> Multi-select <span class="roc-tag">ROC LOCKED</span></p>
                 <div class="pill-row">
                     <span class="pill">Financial Literacy</span>
                     <span class="pill">Entrepreneurship</span>
                     <span class="pill">Work Readiness</span>
                     <span class="pill">Digital Literacy</span>
                 </div>
-                <p>Sub-accounts cannot rename, create, or delete these options. Ensures downstream reporting standards.</p>`
+                <p>One or more categories may be selected per opportunity. Sub-accounts cannot rename, create, or delete these options.</p>`
             },
             'field-program': {
                 phase: 'Phase 1',
                 title: 'Program Tag (L2)',
-                body: `<p><strong>Type:</strong> Multi-select tag <span class="roc-tag">ROC LOCKED</span></p>
+                body: `<p><strong>Type:</strong> Single-select dropdown <span class="roc-tag">ROC LOCKED</span></p>
                 <div class="pill-row">
                     <span class="pill">Company Program</span>
                     <span class="pill">SEP</span>
                     <span class="pill">SET4LYF</span>
                     <span class="pill">10MAG</span>
                 </div>
-                <p>Tags classify opportunities under specific JA Africa program initiatives.</p>`
+                <p>Selects the single program initiative this opportunity belongs to.</p>`
             },
             'field-delivery': {
                 phase: 'Phase 1',
@@ -1017,25 +1163,46 @@
                 phase: 'Phase 4',
                 title: 'Scheduled — Volunteer Assigned',
                 body: `<p>Volunteer has been successfully assigned to the opportunity, either via manual admin approval or auto-assign.</p>
-                <p>At this stage the volunteer is active on the opportunity and can proceed to deliver sessions and log hours.</p>`
+                <p>At this stage the volunteer is active on the opportunity and linked to their shift. They can proceed to deliver sessions and log hours.</p>
+                <span class="status-pill pass">Scheduled</span>`
+            },
+            'deliver-sessions': {
+                phase: 'Phase 4 · Step 1',
+                title: 'Deliver Sessions',
+                body: `<p>Volunteer conducts offline or online delivery sessions as defined by the opportunity's Delivery Mode.</p>
+                <div class="pill-row"><span class="pill">In-Person</span><span class="pill">Online</span><span class="pill">Hybrid</span></div>
+                <p>Sessions are run in the field, classroom, or virtual environment according to the opportunity schedule.</p>`
+            },
+            'log-hours': {
+                phase: 'Phase 4 · Step 2',
+                title: 'Log Hours',
+                body: `<p>After each session, the volunteer records their hours against the opportunity in Better Impact.</p>
+                <p>Logged hours reflect actual time spent delivering and are held as pending until reviewed by admin or M&amp;E.</p>`
+            },
+            'approve-hours': {
+                phase: 'Phase 4 · Step 3',
+                title: 'Approve Hours',
+                body: `<p>Spoke/ROC Admin or the regional M&amp;E team reviews logged hours for accuracy and approves them.</p>
+                <p>Only approved hours count toward the Phase 5 completion % calculation. Rejected or pending hours are excluded.</p>`
             },
             delivery: {
                 phase: 'Phase 4',
-                title: 'Delivery & Hour Logging',
-                body: `<p>After assignment, offline delivery sessions are conducted and hours are recorded in Better Impact.</p>
+                title: 'Delivery & Hour Logging — Overview',
+                body: `<p>After assignment, the volunteer moves through a four-step delivery cycle before M&amp;E validation.</p>
                 <ol class="flow-steps">
-                    <li>Sessions delivered in the field or online.</li>
-                    <li>Volunteer logs hours against the opportunity.</li>
-                    <li>Admin or M&amp;E team reviews and approves logged hours.</li>
-                    <li>Approved hours feed into the completion % calculation.</li>
-                </ol>`
+                    <li><strong>Scheduled</strong> — Volunteer assigned to opportunity shift.</li>
+                    <li><strong>Deliver</strong> — Sessions conducted (In-Person, Online, or Hybrid).</li>
+                    <li><strong>Log</strong> — Volunteer records hours in Better Impact.</li>
+                    <li><strong>Approve</strong> — Admin/M&amp;E reviews and approves logged hours.</li>
+                </ol>
+                <p>Approved hours feed into the Phase 5 completion formula.</p>`
             },
             merl: {
                 phase: 'Phase 5',
                 title: 'M&E Participation Validation',
                 body: `<p>After delivery, the system evaluates volunteer success using the MERL team's 80% completion rule.</p>
                 <div class="formula-box">Completion % = <em>(Approved Hours ÷ Committed Hours) × 100</em></div>
-                <p>Committed Hours are set at opportunity creation (Phase 1). Approved Hours are the total hours approved by admin/M&amp;E after delivery.</p>
+                <p>Committed Hours are set at opportunity creation (Phase 1). Approved Hours come from Phase 4 after admin/M&amp;E review.</p>
                 <p>Click the outcome nodes in the diagram for pass/fail details.</p>`
             },
             'merl-success': {
@@ -1123,6 +1290,15 @@
         document.addEventListener('keydown', e => {
             if (e.key === 'Escape') closePanel();
         });
+
+        function downloadPdf() {
+            const appendix = document.getElementById('print-appendix');
+            appendix.innerHTML = '<h2>DeJAVU Opportunity Flow — Details</h2>' +
+                Object.values(panels).map(p =>
+                    `<section style="margin-bottom:1.2em;page-break-inside:avoid"><h3>${p.phase}: ${p.title}</h3>${p.body}</section>`
+                ).join('');
+            window.print();
+        }
     </script>
 
 </body>
