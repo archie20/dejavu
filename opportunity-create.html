@@ -71,6 +71,23 @@
 
         .pdf-btn:hover { background: var(--gritty-green); color: var(--immersive-blue-black); }
 
+        .ext-link { cursor: pointer; }
+        .ext-link:hover { opacity: 1 !important; filter: brightness(1.05); }
+
+        .page-footer {
+            text-align: center;
+            padding: 20px 24px 40px;
+            font-size: 0.82rem;
+            color: #667;
+        }
+
+        .page-footer a {
+            color: var(--resilient-turquoise);
+            font-weight: 600;
+        }
+
+        .page-footer a:hover { color: var(--boundless-blue); }
+
         #print-appendix { display: none; }
 
         .hint-banner {
@@ -412,6 +429,7 @@
 
         @media print {
             .top-bar, .sidebar, .sidebar-backdrop, .pdf-btn { display: none !important; }
+            .page-footer a::after { content: ' (' attr(href) ')'; font-size: 0.75rem; }
             #print-appendix { display: block; }
             .diagram-block { break-inside: avoid; }
             body { background: white; }
@@ -548,18 +566,23 @@
                 </defs>
                 <rect width="900" height="330" fill="#FAFCFC" />
 
-                <!-- Left illustration -->
-                <g transform="translate(55,75)" opacity="0.9">
-                    <rect x="0" y="0" width="130" height="180" rx="12" fill="#C2EDF0" />
-                    <rect x="15" y="20" width="100" height="8" rx="4" fill="white" />
-                    <rect x="15" y="38" width="70" height="8" rx="4" fill="white" />
-                    <rect x="15" y="56" width="90" height="8" rx="4" fill="white" />
-                    <rect x="15" y="90" width="100" height="60" rx="8" fill="rgba(0,160,175,0.3)" />
-                    <text x="65" y="125" text-anchor="middle" fill="#285F74" font-family="Montserrat,sans-serif"
-                        font-weight="800" font-size="11">Better Impact</text>
-                    <text x="65" y="142" text-anchor="middle" fill="#285F74" font-family="Work Sans,sans-serif"
-                        font-size="9">Activity → Opportunity</text>
-                </g>
+                <!-- Left illustration — links to Better Impact docs -->
+                <a href="https://support.betterimpact.com/en/articles/8780736-comprehensive-guide-to-activities"
+                    target="_blank" rel="noopener noreferrer">
+                    <g class="ext-link" transform="translate(55,75)" opacity="0.9">
+                        <rect x="0" y="0" width="130" height="180" rx="12" fill="#C2EDF0" />
+                        <rect x="15" y="20" width="100" height="8" rx="4" fill="white" />
+                        <rect x="15" y="38" width="70" height="8" rx="4" fill="white" />
+                        <rect x="15" y="56" width="90" height="8" rx="4" fill="white" />
+                        <rect x="15" y="90" width="100" height="60" rx="8" fill="rgba(0,160,175,0.3)" />
+                        <text x="65" y="125" text-anchor="middle" fill="#285F74" font-family="Montserrat,sans-serif"
+                            font-weight="800" font-size="11">Better Impact</text>
+                        <text x="65" y="142" text-anchor="middle" fill="#285F74" font-family="Work Sans,sans-serif"
+                            font-size="9">Activity → Opportunity</text>
+                        <text x="65" y="168" text-anchor="middle" fill="#00A0AF" font-family="Work Sans,sans-serif"
+                            font-size="8" font-weight="600">↗ Activities Guide</text>
+                    </g>
+                </a>
                 <line x1="185" y1="165" x2="218" y2="165" stroke="#00A0AF" stroke-width="2" marker-end="url(#a1b)" />
 
                 <!-- Form card -->
@@ -965,6 +988,11 @@
 
     </main>
 
+    <footer class="page-footer">
+        <a href="https://support.betterimpact.com/en/articles/8780736-comprehensive-guide-to-activities"
+            target="_blank" rel="noopener noreferrer">Better Impact — Comprehensive Guide to Activities</a>
+    </footer>
+
     <div id="print-appendix"></div>
 
     <!-- Sidebar -->
@@ -1012,6 +1040,7 @@
                 phase: 'Phase 1',
                 title: 'Opportunity Creation — Full Field Schema',
                 body: `<p>Required data structure when creating a new Volunteer Opportunity (Better Impact Activity).</p>
+                <p><a href="https://support.betterimpact.com/en/articles/8780736-comprehensive-guide-to-activities" target="_blank" rel="noopener noreferrer">Better Impact — Comprehensive Guide to Activities ↗</a></p>
                 <ul class="detail-list">
                     <li><strong>Opportunity Title</strong><span>Text, max 50 chars. Format: [Program Name] - [Role] - [Location]</span></li>
                     <li><strong>Global Category (L1)</strong><span>Multi-select. ROC Locked: Financial Literacy, Entrepreneurship, Work Readiness, Digital Literacy</span></li>
