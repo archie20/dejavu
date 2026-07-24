@@ -398,6 +398,145 @@
             line-height: 1.5;
         }
 
+        /* ── Executive context overview ── */
+        .exec-overview {
+            padding: 8px 28px 28px;
+        }
+
+        .exec-overview-header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 10px 16px;
+            margin-bottom: 14px;
+        }
+
+        .exec-overview-header h2 {
+            margin: 0;
+            font-size: 1.15rem;
+            color: var(--immersive-blue-black);
+            line-height: 1.35;
+            max-width: 36em;
+        }
+
+        .exec-badge {
+            display: inline-block;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            padding: 5px 10px;
+            border-radius: 4px;
+            background: var(--optimistic-ice);
+            color: var(--boundless-blue);
+            flex-shrink: 0;
+        }
+
+        .exec-intro {
+            margin: 0 0 22px;
+            font-size: 0.95rem;
+            line-height: 1.65;
+            color: #445;
+            max-width: 52em;
+        }
+
+        .exec-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+            margin-bottom: 18px;
+        }
+
+        .exec-panel {
+            background: var(--off-white);
+            border-radius: 14px;
+            border: 1px solid var(--optimistic-ice);
+            border-left: 4px solid var(--resilient-turquoise);
+            padding: 18px 18px 14px;
+        }
+
+        .exec-panel.challenge {
+            border-left-color: var(--boundless-blue);
+        }
+
+        .exec-panel-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .exec-panel-label span[aria-hidden] {
+            font-size: 1.15rem;
+            line-height: 1;
+        }
+
+        .exec-panel h3 {
+            margin: 0;
+            font-size: 0.92rem;
+            color: var(--immersive-blue-black);
+        }
+
+        .exec-panel ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .exec-panel li {
+            padding: 10px 12px;
+            background: var(--pure-white);
+            border-radius: 8px;
+            margin-bottom: 8px;
+            font-size: 0.86rem;
+            line-height: 1.5;
+            color: #445;
+        }
+
+        .exec-panel li:last-child { margin-bottom: 0; }
+
+        .exec-panel li strong {
+            display: block;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.8rem;
+            color: var(--immersive-blue-black);
+            margin-bottom: 2px;
+        }
+
+        .exec-purpose {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 14px 16px;
+            background: rgba(0, 160, 175, 0.06);
+            border: 1px solid rgba(0, 160, 175, 0.22);
+            border-left: 4px solid var(--gritty-green);
+            border-radius: 10px;
+            font-size: 0.88rem;
+            line-height: 1.55;
+            color: #445;
+        }
+
+        .exec-purpose-icon {
+            font-size: 1.1rem;
+            line-height: 1.3;
+            flex-shrink: 0;
+        }
+
+        .exec-purpose strong {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 800;
+            color: var(--immersive-blue-black);
+        }
+
+        @media (max-width: 720px) {
+            .exec-overview { padding: 8px 18px 22px; }
+            .exec-grid { grid-template-columns: 1fr; }
+            .exec-overview-header h2 { font-size: 1.05rem; }
+        }
+
         /* ── Mobile app video demo ── */
         .mobile-demo {
             display: flex;
@@ -766,9 +905,75 @@
 
     <main class="canvas">
 
+        <!-- ═══ EXECUTIVE CONTEXT ═══ -->
+        <section class="diagram-block">
+            <span class="block-tag">CONTEXT</span>
+            <div class="exec-overview">
+                <div class="exec-overview-header">
+                    <h2>Participation Tracking &amp; Feedback Architecture</h2>
+                    <span class="exec-badge">Operational Brief</span>
+                </div>
+
+                <p class="exec-intro">
+                    DeJAVU has been configured to use <strong>auto-approval for hours</strong>.
+                    That removes administrative approval bottlenecks and allows us gather feedback for Monitoring &amp; Evaluation (M&amp;E).
+                </p>
+
+                <div class="exec-grid">
+                    <div class="exec-panel">
+                        <div class="exec-panel-label">
+                            <span aria-hidden="true">⚙️</span>
+                            <h3>Platform Mechanics</h3>
+                        </div>
+                        <ul>
+                            <li>
+                                <strong>Auto-approved hours</strong>
+                                Logged time immediately updates progress toward the
+                                <strong>80% completion rule</strong> required for M&amp;E success
+                                and digital certificates.
+                            </li>
+                            <li>
+                                <strong>Communication constraint</strong>
+                                Better Impact does not natively trigger automated emails when a
+                                volunteer completes their opportunity.
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="exec-panel challenge">
+                        <div class="exec-panel-label">
+                            <span aria-hidden="true">⚡</span>
+                            <h3>Challenge</h3>
+                        </div>
+                        <ul>
+                            <li>
+                                <strong>Survey fatigue</strong>
+                                Prompting for feedback on every routine shift causes frustration and rushed responses.
+                            </li>
+                            <li>
+                                <strong>The objective</strong>
+                                Keep routine hour logging under a few seconds while capturing clean
+                                feedback at program completion.
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="exec-purpose">
+                    <span class="exec-purpose-icon" aria-hidden="true">📌</span>
+                    <div>
+                        <strong>Purpose of this guide:</strong>
+                        The four options below are practical ways to align feedback collection with
+                        the opportunity lifecycle — balancing volunteer experience, admin effort,
+                        and implementation timelines.
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- ═══ OVERVIEW: FOUR OPTIONS ═══ -->
         <section class="diagram-block">
-            <span class="block-tag">OVERVIEW</span>
+            <span class="block-tag">OPTIONS AT A GLANCE</span>
             <p class="block-intro">
                 These are <strong>four independent options</strong> for the same problem — not steps in a
                 sequence. Pick one, or mix them across different opportunity types. Tap any card to read more.
