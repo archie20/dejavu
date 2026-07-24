@@ -1,0 +1,1688 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeJAVU — Feedback Architecture</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&family=Work+Sans:wght@400;500&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --boundless-blue: #285F74;
+            --resilient-turquoise: #00A0AF;
+            --gritty-green: #BBD153;
+            --optimistic-ice: #C2EDF0;
+            --immersive-blue-black: #22404D;
+            --off-white: #EEF3F4;
+            --pure-white: #FFFFFF;
+            --danger-red: #D9534F;
+            --sidebar-w: 400px;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Work Sans', sans-serif;
+            background: var(--off-white);
+            color: var(--immersive-blue-black);
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 800;
+        }
+
+        /* ── Header ── */
+        .top-bar {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        header {
+            background: var(--immersive-blue-black);
+            color: var(--pure-white);
+            padding: 16px 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: none;
+        }
+
+        .header-left { display: flex; align-items: center; gap: 12px; }
+        header h1 { margin: 0; font-size: 1.15rem; }
+        header h1 span { color: var(--resilient-turquoise); }
+
+        .pdf-btn {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            font-size: 0.78rem;
+            background: var(--resilient-turquoise);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 14px;
+            cursor: pointer;
+        }
+
+        .pdf-btn:hover { background: var(--gritty-green); color: var(--immersive-blue-black); }
+
+        .page-footer {
+            text-align: center;
+            padding: 20px 24px 40px;
+            font-size: 0.82rem;
+            color: #667;
+        }
+
+        .page-footer a {
+            color: var(--resilient-turquoise);
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .page-footer a:hover { color: var(--boundless-blue); }
+
+        #print-appendix { display: none; }
+
+        .hint-banner {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 12px 20px;
+            background: linear-gradient(90deg, var(--resilient-turquoise), #00B8C8);
+            color: var(--pure-white);
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            font-size: 0.88rem;
+            letter-spacing: 0.02em;
+            text-align: center;
+            border-bottom: 3px solid var(--gritty-green);
+            box-shadow: 0 4px 16px rgba(0, 160, 175, 0.35);
+            animation: hint-glow 2.5s ease-in-out infinite;
+        }
+
+        .hint-banner-icon {
+            font-size: 1.15rem;
+            line-height: 1;
+            animation: hint-bounce 1.8s ease-in-out infinite;
+        }
+
+        .hint-banner-text strong {
+            font-weight: 800;
+            text-decoration: underline;
+            text-underline-offset: 3px;
+        }
+
+        .hint-banner-arrow {
+            font-size: 1.1rem;
+            font-weight: 800;
+            opacity: 0.9;
+        }
+
+        @keyframes hint-glow {
+            0%, 100% { box-shadow: 0 4px 16px rgba(0, 160, 175, 0.35); }
+            50% { box-shadow: 0 4px 22px rgba(187, 209, 83, 0.45); }
+        }
+
+        @keyframes hint-bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-3px); }
+        }
+
+        /* ── Canvas ── */
+        .canvas {
+            padding: 28px 20px 80px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .diagram-block {
+            background: var(--pure-white);
+            border-radius: 24px;
+            margin-bottom: 32px;
+            box-shadow: 0 8px 32px rgba(34, 64, 77, 0.08);
+            overflow: hidden;
+            position: relative;
+            padding-top: 36px;
+        }
+
+        .diagram-block::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--resilient-turquoise), var(--gritty-green));
+        }
+
+        .block-tag {
+            position: absolute;
+            top: 14px;
+            left: 20px;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 800;
+            font-size: 0.65rem;
+            letter-spacing: 0.08em;
+            color: var(--resilient-turquoise);
+            z-index: 2;
+        }
+
+        .diagram-svg {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+
+        /* Clickable Nodes */
+        .click-node {
+            cursor: pointer;
+            transition: filter 0.2s, transform 0.2s;
+        }
+
+        .click-node:hover {
+            filter: brightness(1.06) drop-shadow(0 4px 12px rgba(0, 160, 175, 0.35));
+        }
+
+        .click-node.active {
+            filter: drop-shadow(0 0 0 3px var(--resilient-turquoise)) brightness(1.04);
+        }
+
+        /* ── Sidebar ── */
+        .sidebar-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(34, 64, 77, 0.45);
+            backdrop-filter: blur(3px);
+            z-index: 200;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        .sidebar-backdrop.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: var(--sidebar-w);
+            max-width: 92vw;
+            height: 100vh;
+            background: var(--pure-white);
+            z-index: 201;
+            transform: translateX(100%);
+            transition: transform 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+            display: flex;
+            flex-direction: column;
+            box-shadow: -8px 0 40px rgba(34, 64, 77, 0.15);
+        }
+
+        .sidebar.open { transform: translateX(0); }
+
+        .sidebar-header {
+            padding: 24px 24px 16px;
+            border-bottom: 1px solid var(--optimistic-ice);
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .sidebar-phase {
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            color: var(--resilient-turquoise);
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+
+        .sidebar-title {
+            margin: 0;
+            font-size: 1.2rem;
+            padding-right: 36px;
+        }
+
+        .sidebar-close {
+            position: absolute;
+            top: 20px;
+            right: 18px;
+            width: 36px;
+            height: 36px;
+            border: none;
+            background: var(--off-white);
+            border-radius: 50%;
+            font-size: 1.3rem;
+            line-height: 1;
+            cursor: pointer;
+            color: var(--immersive-blue-black);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .sidebar-close:hover { background: var(--danger-red); color: white; }
+
+        .sidebar-body {
+            padding: 20px 24px 32px;
+            overflow-y: auto;
+            flex-grow: 1;
+            font-size: 0.92rem;
+            line-height: 1.6;
+            color: #445;
+        }
+
+        .sidebar-body p { margin: 0 0 14px; }
+
+        .detail-list { list-style: none; margin: 0 0 16px; padding: 0; }
+        .detail-list li {
+            padding: 10px 14px;
+            background: var(--off-white);
+            border-radius: 8px;
+            margin-bottom: 8px;
+            font-size: 0.88rem;
+        }
+
+        .detail-list li strong {
+            display: block;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.82rem;
+            color: var(--immersive-blue-black);
+            margin-bottom: 2px;
+        }
+
+        .detail-list li span {
+            font-size: 0.8rem;
+            color: #667;
+        }
+
+        .badge-pill {
+            display: inline-block;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 4px;
+            background: var(--optimistic-ice);
+            color: var(--boundless-blue);
+        }
+
+        .flow-steps {
+            counter-reset: step;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .flow-steps li {
+            counter-increment: step;
+            padding: 12px 12px 12px 44px;
+            position: relative;
+            margin-bottom: 10px;
+            background: var(--off-white);
+            border-radius: 10px;
+            border-left: 3px solid var(--resilient-turquoise);
+        }
+
+        .flow-steps li::before {
+            content: counter(step);
+            position: absolute;
+            left: 12px;
+            top: 12px;
+            width: 22px;
+            height: 22px;
+            background: var(--resilient-turquoise);
+            color: white;
+            border-radius: 50%;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 800;
+            font-size: 0.7rem;
+            text-align: center;
+            line-height: 22px;
+        }
+
+        .status-pill {
+            display: inline-block;
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 4px;
+            margin-top: 6px;
+        }
+
+        .status-pill.pass { background: rgba(187, 209, 83, 0.3); color: #4a5a10; }
+        .status-pill.fail { background: rgba(217, 83, 79, 0.15); color: var(--danger-red); }
+        .status-pill.pending { background: var(--optimistic-ice); color: var(--boundless-blue); }
+
+        .formula-box {
+            background: var(--immersive-blue-black);
+            color: white;
+            border-radius: 10px;
+            padding: 16px;
+            text-align: center;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.88rem;
+            margin: 14px 0;
+        }
+
+        .formula-box em {
+            color: var(--resilient-turquoise);
+            font-style: normal;
+            font-weight: 800;
+        }
+
+        /* ── Live portal walkthrough ── */
+        .walkthrough {
+            padding: 8px 24px 32px;
+        }
+
+        .walkthrough-intro {
+            text-align: center;
+            max-width: 680px;
+            margin: 0 auto 28px;
+            font-size: 0.92rem;
+            line-height: 1.6;
+            color: #556;
+        }
+
+        .block-intro {
+            text-align: center;
+            margin: 0 24px 16px;
+            font-size: 0.88rem;
+            color: #667;
+            line-height: 1.5;
+        }
+
+        /* ── Mobile app video demo ── */
+        .mobile-demo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 36px;
+            flex-wrap: wrap;
+            padding: 8px 24px 32px;
+        }
+
+        .phone-frame {
+            width: 240px;
+            flex-shrink: 0;
+            border-radius: 30px;
+            border: 8px solid var(--immersive-blue-black);
+            background: var(--immersive-blue-black);
+            box-shadow: 0 16px 40px rgba(34, 64, 77, 0.22);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .phone-frame::before {
+            content: '';
+            position: absolute;
+            top: 6px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 5px;
+            border-radius: 3px;
+            background: rgba(255, 255, 255, 0.35);
+            z-index: 2;
+        }
+
+        .phone-frame video {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+
+        .mobile-demo-text {
+            max-width: 400px;
+            font-size: 0.92rem;
+            line-height: 1.65;
+            color: #445;
+        }
+
+        .mobile-demo-text h3 {
+            margin: 0 0 10px;
+            font-size: 1.05rem;
+            color: var(--immersive-blue-black);
+        }
+
+        .mobile-demo-text p { margin: 0 0 14px; }
+
+        @media (max-width: 640px) {
+            .mobile-demo { flex-direction: column; }
+            .mobile-demo-text { text-align: center; }
+        }
+
+        /* ── Caution / timeline notice banner ── */
+        .caution-banner {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin: 0 24px 20px;
+            padding: 14px 16px;
+            background: rgba(217, 83, 79, 0.06);
+            border: 1px solid rgba(217, 83, 79, 0.28);
+            border-left: 4px solid var(--danger-red);
+            border-radius: 10px;
+        }
+
+        .caution-banner-icon {
+            font-size: 1.15rem;
+            line-height: 1.3;
+            flex-shrink: 0;
+        }
+
+        .caution-banner-text {
+            font-size: 0.85rem;
+            line-height: 1.55;
+            color: #445;
+        }
+
+        .caution-banner-text strong {
+            display: block;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 800;
+            font-size: 0.82rem;
+            color: var(--danger-red);
+            margin-bottom: 3px;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+        }
+
+        /* ── Icon legend (used across illustrated diagrams) ── */
+        .legend-row {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px 22px;
+            margin: 0 auto 28px;
+            max-width: 720px;
+            padding: 0 20px;
+        }
+
+        .legend-chip {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: #556;
+        }
+
+        .legend-swatch {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            display: inline-block;
+            flex-shrink: 0;
+        }
+
+        .walkthrough-steps {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 360px));
+            gap: 18px;
+            justify-content: center;
+            align-items: start;
+        }
+
+        .walkthrough-step {
+            cursor: pointer;
+            border-radius: 16px;
+            border: 2px solid var(--optimistic-ice);
+            background: var(--off-white);
+            overflow: hidden;
+            transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+        }
+
+        .walkthrough-step:hover {
+            border-color: var(--resilient-turquoise);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(0, 160, 175, 0.15);
+        }
+
+        .walkthrough-step.active {
+            border-color: var(--resilient-turquoise);
+            box-shadow: 0 0 0 3px rgba(0, 160, 175, 0.25);
+        }
+
+        .step-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 14px 10px;
+            background: white;
+            border-bottom: 1px solid var(--optimistic-ice);
+        }
+
+        .step-number {
+            flex-shrink: 0;
+            width: 28px;
+            height: 28px;
+            background: var(--resilient-turquoise);
+            color: white;
+            border-radius: 50%;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 800;
+            font-size: 0.78rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .step-caption h3 {
+            margin: 0;
+            font-size: 0.88rem;
+            line-height: 1.3;
+            color: var(--immersive-blue-black);
+        }
+
+        .step-caption p {
+            margin: 2px 0 0;
+            font-size: 0.76rem;
+            color: #667;
+            line-height: 1.35;
+        }
+
+        .step-shot {
+            display: block;
+            width: 100%;
+            height: auto;
+            background: white;
+            cursor: zoom-in;
+        }
+
+        .step-arrow {
+            display: none;
+        }
+
+        .walkthrough-note {
+            margin-top: 20px;
+            padding: 14px 18px;
+            background: rgba(217, 83, 79, 0.06);
+            border: 1px dashed rgba(217, 83, 79, 0.4);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+        }
+
+        .walkthrough-note:hover {
+            background: rgba(217, 83, 79, 0.1);
+            border-color: var(--danger-red);
+        }
+
+        .walkthrough-note img {
+            width: min(280px, 38%);
+            flex-shrink: 0;
+            border-radius: 8px;
+            border: 1px solid rgba(217, 83, 79, 0.2);
+        }
+
+        .walkthrough-note-text {
+            flex: 1;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            color: #445;
+        }
+
+        .walkthrough-note-text strong {
+            display: block;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.82rem;
+            color: var(--danger-red);
+            margin-bottom: 4px;
+        }
+
+        @media (max-width: 780px) {
+            .walkthrough-steps {
+                grid-template-columns: 1fr;
+                max-width: 420px;
+                margin: 0 auto;
+            }
+        }
+
+        @media (max-width: 600px) {
+            header { padding: 14px 16px; }
+            header h1 { font-size: 1rem; }
+            .hint-banner {
+                font-size: 0.95rem;
+                padding: 14px 16px;
+                gap: 8px;
+            }
+            .hint-banner-icon { font-size: 1.3rem; }
+            .walkthrough-note {
+                flex-direction: column;
+                text-align: center;
+            }
+            .walkthrough-note img {
+                width: 100%;
+                max-width: 100%;
+            }
+        }
+
+        /* Lightbox for full-size screenshot view */
+        .lightbox {
+            position: fixed;
+            inset: 0;
+            z-index: 300;
+            background: rgba(34, 64, 77, 0.88);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s;
+        }
+
+        .lightbox.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .lightbox img {
+            max-width: min(1200px, 96vw);
+            max-height: 92vh;
+            width: auto;
+            height: auto;
+            border-radius: 12px;
+            box-shadow: 0 16px 60px rgba(0, 0, 0, 0.4);
+        }
+
+        .lightbox-close {
+            position: absolute;
+            top: 20px;
+            right: 24px;
+            width: 44px;
+            height: 44px;
+            border: none;
+            background: white;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            line-height: 1;
+            cursor: pointer;
+            color: var(--immersive-blue-black);
+        }
+
+        .lightbox-close:hover {
+            background: var(--danger-red);
+            color: white;
+        }
+
+        @media print {
+            .top-bar, .sidebar, .sidebar-backdrop, .pdf-btn, .lightbox { display: none !important; }
+            .page-footer a::after { content: ' (' attr(href) ')'; font-size: 0.75rem; }
+            #print-appendix { display: block; }
+            .diagram-block { break-inside: avoid; }
+            .walkthrough-step { break-inside: avoid; }
+            body { background: white; }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Shared illustration pieces reused across every diagram below -->
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+        <defs>
+            <symbol id="ic-person" viewBox="0 0 44 54">
+                <circle cx="22" cy="12" r="11" />
+                <path d="M4 54 C4 33 10 25 22 25 C34 25 40 33 40 54 Z" />
+            </symbol>
+            <symbol id="ic-check" viewBox="0 0 24 24">
+                <path d="M4 13 L9 18 L20 5" fill="none" stroke-width="3.5" stroke-linecap="round"
+                    stroke-linejoin="round" />
+            </symbol>
+            <symbol id="ic-cross" viewBox="0 0 24 24">
+                <path d="M5 5 L19 19 M19 5 L5 19" fill="none" stroke-width="3.5" stroke-linecap="round" />
+            </symbol>
+        </defs>
+    </svg>
+
+    <div class="top-bar">
+        <header>
+            <div class="header-left">
+                <svg width="36" height="36" viewBox="0 0 100 100" aria-hidden="true">
+                    <polygon points="50,5 95,50 50,95 5,50" fill="#00A0AF" />
+                    <polygon points="50,5 72.5,27.5 50,50 27.5,27.5" fill="#285F74" opacity="0.8" />
+                </svg>
+                <h1>DeJAVU <span>Feedback Architecture</span></h1>
+            </div>
+            <button class="pdf-btn" onclick="downloadPdf()">↓ PDF</button>
+        </header>
+        <div class="hint-banner" role="note">
+            <span class="hint-banner-icon" aria-hidden="true">👆</span>
+            <span class="hint-banner-text"><strong>Tap any node</strong> to view configuration details</span>
+            <span class="hint-banner-arrow" aria-hidden="true">→</span>
+        </div>
+    </div>
+
+    <main class="canvas">
+
+        <!-- ═══ OVERVIEW: FOUR OPTIONS ═══ -->
+        <section class="diagram-block">
+            <span class="block-tag">OVERVIEW</span>
+            <p class="block-intro">
+                These are <strong>four independent options</strong> for the same problem — not steps in a
+                sequence. Pick one, or mix them across different opportunity types. Tap any card to read more.
+            </p>
+            <div class="legend-row">
+                <span class="legend-chip"><span class="legend-swatch" style="background:#00A0AF"></span> Volunteer</span>
+                <span class="legend-chip"><span class="legend-swatch" style="background:#285F74"></span> Admin / Country
+                    Team</span>
+                <span class="legend-chip"><span class="legend-swatch" style="background:#BBD153"></span> Happens
+                    automatically</span>
+            </div>
+            <svg class="diagram-svg" viewBox="0 0 900 270" xmlns="http://www.w3.org/2000/svg">
+                <rect width="900" height="270" fill="#FAFCFC" />
+
+                <!-- Option 1 card -->
+                <g class="click-node" data-panel="o1-intro">
+                    <rect x="26" y="20" width="200" height="232" rx="16" fill="white" stroke="#BBD153" stroke-width="2" />
+                    <circle cx="52" cy="46" r="14" fill="#22404D" />
+                    <text x="52" y="46" text-anchor="middle" dominant-baseline="middle" fill="white" font-weight="800"
+                        font-family="Montserrat,sans-serif" font-size="11">1</text>
+                    <text x="126" y="88" text-anchor="middle" font-size="30">🔀</text>
+                    <text x="126" y="122" text-anchor="middle" fill="#22404D" font-family="Montserrat,sans-serif"
+                        font-weight="800" font-size="11">Match the Rule</text>
+                    <text x="126" y="138" text-anchor="middle" fill="#22404D" font-family="Montserrat,sans-serif"
+                        font-weight="800" font-size="11">to the Opportunity</text>
+                    <text x="126" y="164" text-anchor="middle" fill="#667" font-size="9">One-off events get instant</text>
+                    <text x="126" y="178" text-anchor="middle" fill="#667" font-size="9">feedback; long programs wait</text>
+                    <text x="126" y="192" text-anchor="middle" fill="#667" font-size="9">until the final shift.</text>
+                    <rect x="44" y="210" width="164" height="26" rx="13" fill="rgba(187,209,83,0.3)" stroke="#BBD153"
+                        stroke-width="1.5" />
+                    <text x="126" y="227" text-anchor="middle" dominant-baseline="middle" fill="#4a5a10"
+                        font-family="Work Sans,sans-serif" font-weight="700" font-size="9">★ Best overall fit</text>
+                </g>
+
+                <!-- Option 2 card -->
+                <g class="click-node" data-panel="o2-intro">
+                    <rect x="242" y="20" width="200" height="232" rx="16" fill="white" stroke="#00A0AF" stroke-width="2" />
+                    <circle cx="268" cy="46" r="14" fill="#00A0AF" />
+                    <text x="268" y="46" text-anchor="middle" dominant-baseline="middle" fill="white" font-weight="800"
+                        font-family="Montserrat,sans-serif" font-size="11">2</text>
+                    <text x="342" y="88" text-anchor="middle" font-size="30">📝</text>
+                    <text x="342" y="122" text-anchor="middle" fill="#22404D" font-family="Montserrat,sans-serif"
+                        font-weight="800" font-size="11">Keep Feedback</text>
+                    <text x="342" y="138" text-anchor="middle" fill="#22404D" font-family="Montserrat,sans-serif"
+                        font-weight="800" font-size="11">Optional</text>
+                    <text x="342" y="164" text-anchor="middle" fill="#667" font-size="9">Volunteers can skip it on</text>
+                    <text x="342" y="178" text-anchor="middle" fill="#667" font-size="9">routine logs and answer</text>
+                    <text x="342" y="192" text-anchor="middle" fill="#667" font-size="9">whenever they're ready.</text>
+                    <rect x="260" y="210" width="164" height="26" rx="13" fill="#C2EDF0" stroke="#00A0AF"
+                        stroke-width="1.5" />
+                    <text x="342" y="227" text-anchor="middle" dominant-baseline="middle" fill="#285F74"
+                        font-family="Work Sans,sans-serif" font-weight="700" font-size="9">Quickest fix today</text>
+                </g>
+
+                <!-- Option 3 card -->
+                <g class="click-node" data-panel="o3-intro">
+                    <rect x="458" y="20" width="200" height="232" rx="16" fill="white" stroke="#285F74" stroke-width="2" />
+                    <circle cx="484" cy="46" r="14" fill="#285F74" />
+                    <text x="484" y="46" text-anchor="middle" dominant-baseline="middle" fill="white" font-weight="800"
+                        font-family="Montserrat,sans-serif" font-size="11">3</text>
+                    <text x="558" y="88" text-anchor="middle" font-size="30">📧</text>
+                    <text x="558" y="122" text-anchor="middle" fill="#22404D" font-family="Montserrat,sans-serif"
+                        font-weight="800" font-size="11">Admin Sends</text>
+                    <text x="558" y="138" text-anchor="middle" fill="#22404D" font-family="Montserrat,sans-serif"
+                        font-weight="800" font-size="11">Surveys Weekly</text>
+                    <text x="558" y="164" text-anchor="middle" fill="#667" font-size="9">Once a week, a person finds</text>
+                    <text x="558" y="178" text-anchor="middle" fill="#667" font-size="9">volunteers near 80% and</text>
+                    <text x="558" y="192" text-anchor="middle" fill="#667" font-size="9">emails them by hand.</text>
+                    <rect x="476" y="210" width="164" height="26" rx="13" fill="rgba(40,95,116,0.08)" stroke="#285F74"
+                        stroke-width="1.5" />
+                    <text x="558" y="227" text-anchor="middle" dominant-baseline="middle" fill="#285F74"
+                        font-family="Work Sans,sans-serif" font-weight="700" font-size="9">No new setup needed</text>
+                </g>
+
+                <!-- Option 4 card -->
+                <g class="click-node" data-panel="o4-root">
+                    <rect x="674" y="20" width="200" height="232" rx="16" fill="white" stroke="#BBD153" stroke-width="2" />
+                    <circle cx="700" cy="46" r="14" fill="#BBD153" />
+                    <text x="700" y="46" text-anchor="middle" dominant-baseline="middle" fill="#4a5a10" font-weight="800"
+                        font-family="Montserrat,sans-serif" font-size="11">4</text>
+                    <text x="774" y="88" text-anchor="middle" font-size="30">🔁</text>
+                    <text x="774" y="122" text-anchor="middle" fill="#22404D" font-family="Montserrat,sans-serif"
+                        font-weight="800" font-size="11">System Sends</text>
+                    <text x="774" y="138" text-anchor="middle" fill="#22404D" font-family="Montserrat,sans-serif"
+                        font-weight="800" font-size="11">Surveys Automatically</text>
+                    <text x="774" y="164" text-anchor="middle" fill="#667" font-size="9">Every day, the system finds</text>
+                    <text x="774" y="178" text-anchor="middle" fill="#667" font-size="9">volunteers at 80% and emails</text>
+                    <text x="774" y="192" text-anchor="middle" fill="#667" font-size="9">them — hands-free.</text>
+                    <rect x="692" y="210" width="164" height="26" rx="13" fill="rgba(187,209,83,0.35)" stroke="#BBD153"
+                        stroke-width="1.5" />
+                    <text x="774" y="227" text-anchor="middle" dominant-baseline="middle" fill="#4a5a10"
+                        font-family="Work Sans,sans-serif" font-weight="700" font-size="9">Fully automatic</text>
+                </g>
+            </svg>
+        </section>
+
+        <!-- ═══ LIVE PORTAL WALKTHROUGH ═══ -->
+        <section class="diagram-block">
+            <span class="block-tag">LIVE PORTAL · SAMPLE END-OF-OPPORTUNITY FEEDBACK</span>
+            <div class="walkthrough">
+                <p class="walkthrough-intro">
+                    Actual DeJAVU volunteer portal screens — logging hours and completing feedback on the
+                    <strong>final shift</strong>. Click any screenshot to view full size.
+                </p>
+
+                <div class="walkthrough-steps">
+                    <article class="walkthrough-step click-node" data-panel="walkthrough-1">
+                        <div class="step-header">
+                            <span class="step-number">1</span>
+                            <div class="step-caption">
+                                <h3>Open Hours Tab</h3>
+                                <p>Select your activity from the dropdown</p>
+                            </div>
+                        </div>
+                        <img class="step-shot" src="assets/screenshots/step-01-empty-form.png"
+                            alt="DeJAVU Hours page — empty log hours form with activity dropdown">
+                    </article>
+
+                    <article class="walkthrough-step click-node" data-panel="walkthrough-2">
+                        <div class="step-header">
+                            <span class="step-number">2</span>
+                            <div class="step-caption">
+                                <h3>Log Your Hours</h3>
+                                <p>Enter date, hours &amp; minutes and feedback which appears below</p>
+                            </div>
+                        </div>
+                        <img class="step-shot" src="assets/screenshots/step-02-activity-and-hours.png"
+                            alt="Log hours form with activity selected and 6 hours entered, feedback section visible">
+                    </article>
+
+                    <article class="walkthrough-step click-node" data-panel="walkthrough-3">
+                        <div class="step-header">
+                            <span class="step-number">3</span>
+                            <div class="step-caption">
+                                <h3>Answer Feedback</h3>
+                                <p>Rate satisfaction — this box only appears on the final shift</p>
+                            </div>
+                        </div>
+                        <img class="step-shot" src="assets/screenshots/step-03-feedback-completed.png"
+                            alt="Log hours form with the feedback question completed and rating selected">
+                    </article>
+
+                    <article class="walkthrough-step click-node" data-panel="walkthrough-4">
+                        <div class="step-header">
+                            <span class="step-number">4</span>
+                            <div class="step-caption">
+                                <h3>Save &amp; Done</h3>
+                                <p>Created successfully — status Approved instantly</p>
+                            </div>
+                        </div>
+                        <img class="step-shot" src="assets/screenshots/step-04-success-approved.png"
+                            alt="Success toast Created successfully with approved entry in recent entries table">
+                    </article>
+                </div>
+
+                <div class="walkthrough-note click-node" data-panel="walkthrough-validation">
+                    <img src="assets/screenshots/step-optional-validation-error.png"
+                        alt="Validation error shown when a required feedback field is left blank">
+                    <div class="walkthrough-note-text">
+                        <strong>⚠️ What happens if feedback is required</strong>
+                        If a feedback question is marked "Required," volunteers get stuck here on every routine
+                        log until they answer it. Option 2 fixes this by marking questions optional.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ═══ LIVE MOBILE APP DEMO ═══ -->
+        <section class="diagram-block">
+            <span class="block-tag">LIVE MOBILE APP · LOGGING HOURS DEMO</span>
+            <p class="block-intro">
+                The same current live flow also works from a phone. Here's an actual screen recording of a
+                volunteer logging hours in the DeJAVU mobile app.
+            </p>
+            <div class="mobile-demo">
+                <div class="phone-frame">
+                    <video controls playsinline preload="metadata"
+                        src="assets/screenshots/mobile-log-hours-demo.mp4">
+                        Your browser doesn't support embedded video. You can
+                        <a href="assets/screenshots/mobile-log-hours-demo.mp4">download the recording</a> instead.
+                    </video>
+                </div>
+                <div class="mobile-demo-text">
+                    <h3>📱 Logging hours on mobile is just as easy</h3>
+                    <p>Volunteers aren't limited to a desktop browser — the exact same hour-logging flow shown
+                        above in the Live Portal walkthrough is available on the mobile app, in a layout built
+                        for a phone screen.</p>
+                    <ul class="detail-list">
+                        <li><strong>Same steps, smaller screen</strong><span>Pick an activity, enter hours, tap
+                                save — no extra taps or separate mobile-only setup.</span></li>
+                        <li><strong>Same rules apply</strong><span>Whether feedback shows up depends on the same
+                                Option 1 / Option 2 settings — not on which device is used.</span></li>
+                        <li><strong>Same instant approval</strong><span>Hours submitted from mobile are approved
+                                immediately, just like on the web portal.</span></li>
+                    </ul>
+                    <p style="font-size:0.82rem;color:#667;">Low logging effort on <em>every</em> device</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ═══ OPTION 1: THE HYBRID RULE (OPPORTUNITY-TYPE SPLIT) ═══ -->
+        <section class="diagram-block">
+            <span class="block-tag">OPTION 1 · MATCH THE RULE TO THE OPPORTUNITY</span>
+            <p class="block-intro">
+                Not every opportunity behaves the same way, so feedback shouldn't either. Ask one question first —
+                <strong>is this a one-off event or a multi-shift program?</strong> — then follow that lane.
+            </p>
+            <svg class="diagram-svg" viewBox="0 0 900 400" xmlns="http://www.w3.org/2000/svg">
+                <rect width="900" height="400" fill="#FAFCFC" />
+                <defs>
+                    <marker id="a1" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto">
+                        <path d="M0,0 L0,6 L7,3 z" fill="#98A6AC" />
+                    </marker>
+                </defs>
+
+                <!-- Signpost / decision diamond -->
+                <g class="click-node" data-panel="o1-intro">
+                    <path d="M450 16 L516 56 L450 96 L384 56 Z" fill="#22404D" />
+                    <text x="450" y="52" text-anchor="middle" fill="white" font-family="Montserrat,sans-serif"
+                        font-weight="800" font-size="10">Which type is</text>
+                    <text x="450" y="66" text-anchor="middle" fill="white" font-family="Montserrat,sans-serif"
+                        font-weight="800" font-size="10">this opportunity?</text>
+                </g>
+                <path d="M420 84 C 320 110, 240 110, 225 130" fill="none" stroke="#98A6AC" stroke-width="2"
+                    marker-end="url(#a1)" />
+                <path d="M480 84 C 580 110, 660 110, 675 130" fill="none" stroke="#98A6AC" stroke-width="2"
+                    marker-end="url(#a1)" />
+
+                <!-- LEFT LANE: One-off event -->
+                <g class="click-node" data-panel="o1-oneoff">
+                    <rect x="40" y="130" width="370" height="252" rx="16" fill="rgba(0,160,175,0.06)" stroke="#00A0AF"
+                        stroke-width="2" />
+                    <rect x="60" y="146" width="330" height="30" rx="15" fill="#00A0AF" />
+                    <text x="225" y="166" text-anchor="middle" fill="white" font-family="Montserrat,sans-serif"
+                        font-weight="800" font-size="11">ONE-OFF EVENT — e.g. Competition Judge</text>
+
+                    <!-- Frame 1: works one day -->
+                    <use href="#ic-person" x="72" y="192" width="34" height="42" fill="#00A0AF" />
+                    <text x="120" y="200" fill="#22404D" font-family="Work Sans,sans-serif" font-weight="700"
+                        font-size="10.5">Volunteers for a single day</text>
+                    <text x="120" y="216" fill="#667" font-size="9">📅 One shift, start to finish</text>
+
+                    <path d="M225 246 L225 262" stroke="#98A6AC" stroke-width="2" marker-end="url(#a1)" />
+
+                    <!-- Frame 2: logs + answers together -->
+                    <use href="#ic-person" x="72" y="270" width="34" height="42" fill="#00A0AF" />
+                    <text x="120" y="278" fill="#22404D" font-family="Work Sans,sans-serif" font-weight="700"
+                        font-size="10.5">Logs hours &amp; answers a few quick</text>
+                    <text x="120" y="292" fill="#22404D" font-family="Work Sans,sans-serif" font-weight="700"
+                        font-size="10.5">questions — same screen</text>
+                    <text x="120" y="308" fill="#667" font-size="9">⏱️ + ⭐ together, once</text>
+
+                    <rect x="60" y="336" width="330" height="32" rx="8" fill="rgba(187,209,83,0.3)" stroke="#BBD153"
+                        stroke-width="1.5" />
+                    <use href="#ic-check" x="76" y="342" width="18" height="18" stroke="#4a5a10" />
+                    <text x="230" y="356" text-anchor="middle" dominant-baseline="middle" fill="#4a5a10"
+                        font-family="Work Sans,sans-serif" font-weight="700" font-size="10">Done instantly — approved &amp; feedback saved</text>
+                </g>
+
+                <!-- RIGHT LANE: Multi-shift program -->
+                <g class="click-node" data-panel="o1-multi">
+                    <rect x="490" y="130" width="370" height="252" rx="16" fill="rgba(40,95,116,0.06)" stroke="#285F74"
+                        stroke-width="2" />
+                    <rect x="510" y="146" width="330" height="30" rx="15" fill="#285F74" />
+                    <text x="675" y="166" text-anchor="middle" fill="white" font-family="Montserrat,sans-serif"
+                        font-weight="800" font-size="11">MULTI-SHIFT PROGRAM — e.g. Company Program</text>
+
+                    <!-- Frame 1: many shifts -->
+                    <use href="#ic-person" x="522" y="192" width="34" height="42" fill="#285F74" />
+                    <text x="570" y="200" fill="#22404D" font-family="Work Sans,sans-serif" font-weight="700"
+                        font-size="10.5">Volunteers over many shifts</text>
+                    <text x="570" y="216" fill="#667" font-size="9">📅 📅 📅 across several weeks</text>
+
+                    <path d="M675 234 L675 250" stroke="#98A6AC" stroke-width="2" marker-end="url(#a1)" />
+
+                    <!-- Frame 2: logs quickly, no form -->
+                    <use href="#ic-person" x="522" y="258" width="34" height="42" fill="#285F74" />
+                    <text x="570" y="266" fill="#22404D" font-family="Work Sans,sans-serif" font-weight="700"
+                        font-size="10.5">Logs each shift in seconds —</text>
+                    <text x="570" y="282" fill="#22404D" font-family="Work Sans,sans-serif" font-weight="700"
+                        font-size="10.5">no survey pop-up, every time</text>
+                    <text x="570" y="298" fill="#667" font-size="9">⏱️ quick &amp; friction-free</text>
+
+                    <rect x="510" y="336" width="330" height="32" rx="8" fill="#C2EDF0" stroke="#00A0AF"
+                        stroke-width="1.5" />
+                    <text x="675" y="356" text-anchor="middle" dominant-baseline="middle" fill="#285F74"
+                        font-family="Work Sans,sans-serif" font-weight="700" font-size="10">🎯 Feedback asked once, at 80% — see Option 3 or 4</text>
+                </g>
+            </svg>
+        </section>
+
+        <!-- ═══ OPTION 2: OPTIONAL FIELDS + HELPER TEXT ═══ -->
+        <section class="diagram-block">
+            <span class="block-tag">OPTION 2 · KEEP FEEDBACK OPTIONAL</span>
+            <p class="block-intro">
+                If feedback fields must stay switched on for every log (Option 1 not possible), the fix is one
+                setting change: make every question <strong>optional</strong>. See the actual screens in the
+                <strong>Live Portal walkthrough</strong> above — this diagram shows why the setting matters.
+            </p>
+            <svg class="diagram-svg" viewBox="0 0 900 390" xmlns="http://www.w3.org/2000/svg">
+                <rect width="900" height="390" fill="#FAFCFC" />
+                <defs>
+                    <marker id="a2" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto">
+                        <path d="M0,0 L0,6 L7,3 z" fill="#D9534F" />
+                    </marker>
+                    <marker id="a2b" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto">
+                        <path d="M0,0 L0,6 L7,3 z" fill="#4a5a10" />
+                    </marker>
+                </defs>
+
+                <!-- LEFT: Required (avoid) -->
+                <g class="click-node" data-panel="o2-required">
+                    <rect x="40" y="20" width="370" height="290" rx="16" fill="rgba(217,83,79,0.05)"
+                        stroke="#D9534F" stroke-width="2" stroke-dasharray="6,4" />
+                    <rect x="60" y="36" width="330" height="30" rx="15" fill="#D9534F" />
+                    <text x="225" y="56" text-anchor="middle" fill="white" font-family="Montserrat,sans-serif"
+                        font-weight="800" font-size="11">🚫 IF MARKED "REQUIRED"</text>
+
+                    <use href="#ic-person" x="72" y="90" width="40" height="48" fill="#D9534F" />
+                    <text x="122" y="102" fill="#22404D" font-family="Work Sans,sans-serif" font-weight="700"
+                        font-size="10.5">Volunteer logs a routine shift</text>
+                    <text x="122" y="118" fill="#667" font-size="9">...and hits the feedback question</text>
+
+                    <rect x="72" y="146" width="318" height="60" rx="8" fill="white" stroke="#D9534F" stroke-width="1.5" />
+                    <text x="86" y="166" fill="#22404D" font-size="9.5" font-weight="600">Employee Satisfaction *</text>
+                    <rect x="86" y="174" width="290" height="18" rx="4" fill="#FBE9E8" stroke="#D9534F" />
+                    <text x="94" y="187" fill="#D9534F" font-size="8.5">"This field is required"</text>
+
+                    <path d="M231 216 L231 232" stroke="#D9534F" stroke-width="2" marker-end="url(#a2)" />
+                    <rect x="72" y="238" width="318" height="40" rx="8" fill="#D9534F" />
+                    <use href="#ic-cross" x="86" y="248" width="20" height="20" stroke="white" />
+                    <text x="235" y="263" text-anchor="middle" dominant-baseline="middle" fill="white"
+                        font-family="Work Sans,sans-serif" font-weight="700" font-size="10">Can't save until they answer — every time</text>
+                </g>
+
+                <!-- RIGHT: Optional (recommended) -->
+                <g class="click-node" data-panel="o2-optional">
+                    <rect x="490" y="20" width="370" height="290" rx="16" fill="rgba(187,209,83,0.06)"
+                        stroke="#BBD153" stroke-width="2" />
+                    <rect x="510" y="36" width="330" height="30" rx="15" fill="#BBD153" />
+                    <text x="675" y="56" text-anchor="middle" fill="#22404D" font-family="Montserrat,sans-serif"
+                        font-weight="800" font-size="11">✅ WHEN MARKED "OPTIONAL"</text>
+
+                    <use href="#ic-person" x="522" y="90" width="40" height="48" fill="#BBD153" />
+                    <text x="572" y="102" fill="#22404D" font-family="Work Sans,sans-serif" font-weight="700"
+                        font-size="10.5">Volunteer logs a routine shift</text>
+                    <text x="572" y="118" fill="#667" font-size="9">...sees the same question</text>
+
+                    <rect x="522" y="146" width="318" height="60" rx="8" fill="white" stroke="#BBD153" stroke-width="1.5" />
+                    <text x="536" y="166" fill="#22404D" font-size="9.5" font-weight="600">Employee Satisfaction
+                        <tspan fill="#888" font-weight="400">(Optional)</tspan></text>
+                    <text x="536" y="186" fill="#AAA" font-size="12">⭐ ⭐ ⭐ ⭐ ⭐</text>
+                    <text x="700" y="186" fill="#667" font-size="8.5">← free to skip</text>
+
+                    <path d="M681 216 L681 232" stroke="#4a5a10" stroke-width="2" marker-end="url(#a2b)" />
+                    <rect x="522" y="238" width="318" height="40" rx="8" fill="rgba(187,209,83,0.3)" stroke="#BBD153"
+                        stroke-width="1.5" />
+                    <use href="#ic-check" x="536" y="248" width="20" height="20" stroke="#4a5a10" />
+                    <text x="695" y="263" text-anchor="middle" dominant-baseline="middle" fill="#4a5a10"
+                        font-family="Work Sans,sans-serif" font-weight="700" font-size="10">Saves instantly — answer now or later</text>
+                </g>
+
+                <!-- Reminder sticky note, ties both sides together -->
+                <g class="click-node" data-panel="o2-reminder">
+                    <rect x="40" y="326" width="820" height="48" rx="10" fill="#FFF7DC" stroke="#E8CE6E"
+                        stroke-width="1.5" />
+                    <text x="66" y="346" font-size="16">💡</text>
+                    <text x="90" y="345" fill="#22404D" font-family="Work Sans,sans-serif" font-weight="700"
+                        font-size="10">Add a friendly reminder next to the question:</text>
+                    <text x="90" y="362" fill="#556" font-style="italic" font-size="9.5">"Routine shift? Feel
+                        free to skip — answer this only on your final shift."</text>
+                </g>
+            </svg>
+        </section>
+
+        <!-- ═══ OPTION 3: MANUAL MILESTONE PIPELINE ═══ -->
+        <section class="diagram-block">
+            <span class="block-tag">OPTION 3 · A WEEK IN THE LIFE OF AN ADMIN</span>
+            <p class="block-intro">
+                No new tools required — just a repeating weekly task using a Better Impact saved search.
+                Read the strip left to right; it loops back to <strong>Monday</strong> every week.
+            </p>
+            <svg class="diagram-svg" viewBox="0 0 900 340" xmlns="http://www.w3.org/2000/svg">
+                <rect width="900" height="340" fill="#FAFCFC" />
+                <defs>
+                    <marker id="a3" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto">
+                        <path d="M0,0 L0,6 L7,3 z" fill="#98A6AC" />
+                    </marker>
+                </defs>
+
+                <!-- Frame 1: Volunteers log all week -->
+                <g class="click-node" data-panel="o3-1">
+                    <rect x="16" y="20" width="156" height="256" rx="14" fill="white" stroke="#00A0AF" stroke-width="2" />
+                    <rect x="16" y="20" width="156" height="28" rx="14" fill="#00A0AF" />
+                    <text x="94" y="39" text-anchor="middle" fill="white" font-family="Montserrat,sans-serif"
+                        font-weight="800" font-size="9">MON – FRI</text>
+                    <use href="#ic-person" x="42" y="60" width="24" height="30" fill="#00A0AF" />
+                    <use href="#ic-person" x="72" y="60" width="24" height="30" fill="#00A0AF" opacity="0.7" />
+                    <use href="#ic-person" x="102" y="60" width="24" height="30" fill="#00A0AF" opacity="0.5" />
+                    <text x="94" y="118" text-anchor="middle" fill="#22404D" font-family="Work Sans,sans-serif"
+                        font-weight="700" font-size="9.5">Volunteers log</text>
+                    <text x="94" y="132" text-anchor="middle" fill="#22404D" font-family="Work Sans,sans-serif"
+                        font-weight="700" font-size="9.5">hours all week</text>
+                    <text x="94" y="152" text-anchor="middle" fill="#667" font-size="8.5">⏱️ No survey</text>
+                    <text x="94" y="166" text-anchor="middle" fill="#667" font-size="8.5">shown — quick &amp; easy</text>
+                </g>
+                <path d="M172 148 L196 148" stroke="#98A6AC" stroke-width="2" marker-end="url(#a3)" />
+
+                <!-- Frame 2: Friday reminder -->
+                <g class="click-node" data-panel="o3-2">
+                    <rect x="198" y="20" width="150" height="256" rx="14" fill="white" stroke="#285F74" stroke-width="2" />
+                    <rect x="198" y="20" width="150" height="28" rx="14" fill="#285F74" />
+                    <text x="273" y="39" text-anchor="middle" fill="white" font-family="Montserrat,sans-serif"
+                        font-weight="800" font-size="9">FRIDAY</text>
+                    <text x="273" y="92" text-anchor="middle" font-size="30">📅🔔</text>
+                    <use href="#ic-person" x="255" y="130" width="36" height="44" fill="#285F74" />
+                    <text x="273" y="192" text-anchor="middle" fill="#22404D" font-family="Work Sans,sans-serif"
+                        font-weight="700" font-size="9.5">Admin's weekly</text>
+                    <text x="273" y="206" text-anchor="middle" fill="#22404D" font-family="Work Sans,sans-serif"
+                        font-weight="700" font-size="9.5">reminder pops up</text>
+                    <text x="273" y="226" text-anchor="middle" fill="#667" font-size="8.5">"Check who's ready</text>
+                    <text x="273" y="240" text-anchor="middle" fill="#667" font-size="8.5">for feedback"</text>
+                </g>
+                <path d="M348 148 L372 148" stroke="#98A6AC" stroke-width="2" marker-end="url(#a3)" />
+
+                <!-- Frame 3: Search -->
+                <g class="click-node" data-panel="o3-3">
+                    <rect x="374" y="20" width="150" height="256" rx="14" fill="white" stroke="#22404D" stroke-width="2" />
+                    <rect x="374" y="20" width="150" height="28" rx="14" fill="#22404D" />
+                    <text x="449" y="39" text-anchor="middle" fill="white" font-family="Montserrat,sans-serif"
+                        font-weight="800" font-size="9">SEARCH</text>
+                    <text x="449" y="86" text-anchor="middle" font-size="26">🔍</text>
+                    <rect x="394" y="100" width="110" height="18" rx="4" fill="rgba(187,209,83,0.35)" stroke="#BBD153" />
+                    <text x="400" y="112" fill="#4a5a10" font-size="7.5" font-weight="700">Ama — 90% ✓</text>
+                    <rect x="394" y="122" width="110" height="18" rx="4" fill="rgba(187,209,83,0.35)" stroke="#BBD153" />
+                    <text x="400" y="134" fill="#4a5a10" font-size="7.5" font-weight="700">Kojo — 85% ✓</text>
+                    <rect x="394" y="144" width="110" height="18" rx="4" fill="#EEF3F4" />
+                    <text x="400" y="156" fill="#889" font-size="7.5">Efua — 40%</text>
+                    <text x="449" y="192" text-anchor="middle" fill="#22404D" font-family="Work Sans,sans-serif"
+                        font-weight="700" font-size="9.5">Saved search finds</text>
+                    <text x="449" y="206" text-anchor="middle" fill="#22404D" font-family="Work Sans,sans-serif"
+                        font-weight="700" font-size="9.5">volunteers ≥ 80%</text>
+                    <text x="449" y="226" text-anchor="middle" fill="#667" font-size="8.5">One filter, already</text>
+                    <text x="449" y="240" text-anchor="middle" fill="#667" font-size="8.5">saved &amp; ready to reuse</text>
+                </g>
+                <path d="M524 148 L548 148" stroke="#98A6AC" stroke-width="2" marker-end="url(#a3)" />
+
+                <!-- Frame 4: Bulk send -->
+                <g class="click-node" data-panel="o3-4">
+                    <rect x="550" y="20" width="166" height="256" rx="14" fill="white" stroke="#285F74" stroke-width="2" />
+                    <rect x="550" y="20" width="166" height="28" rx="14" fill="#285F74" />
+                    <text x="633" y="39" text-anchor="middle" fill="white" font-family="Montserrat,sans-serif"
+                        font-weight="800" font-size="9">SELECT ALL + SEND</text>
+                    <use href="#ic-person" x="574" y="58" width="30" height="36" fill="#285F74" />
+                    <text x="608" y="80" font-size="14">🖱️</text>
+                    <text x="644" y="86" font-size="18">✉️</text>
+                    <text x="670" y="70" font-size="14">✉️</text>
+                    <text x="670" y="100" font-size="14">✉️</text>
+                    <use href="#ic-person" x="600" y="120" width="20" height="26" fill="#00A0AF" />
+                    <use href="#ic-person" x="628" y="120" width="20" height="26" fill="#00A0AF" opacity="0.75" />
+                    <use href="#ic-person" x="656" y="120" width="20" height="26" fill="#00A0AF" opacity="0.5" />
+                    <text x="633" y="192" text-anchor="middle" fill="#22404D" font-family="Work Sans,sans-serif"
+                        font-weight="700" font-size="9.5">Admin selects them</text>
+                    <text x="633" y="206" text-anchor="middle" fill="#22404D" font-family="Work Sans,sans-serif"
+                        font-weight="700" font-size="9.5">all &amp; clicks Send once</text>
+                    <text x="633" y="226" text-anchor="middle" fill="#667" font-size="8.5">📧 One bulk email,</text>
+                    <text x="633" y="240" text-anchor="middle" fill="#667" font-size="8.5">not one at a time</text>
+                </g>
+                <path d="M716 148 L740 148" stroke="#98A6AC" stroke-width="2" marker-end="url(#a3)" />
+
+                <!-- Frame 5: outcome + loop -->
+                <g class="click-node" data-panel="o3-5">
+                    <rect x="742" y="20" width="142" height="256" rx="14" fill="rgba(187,209,83,0.1)" stroke="#BBD153"
+                        stroke-width="2" />
+                    <rect x="742" y="20" width="142" height="28" rx="14" fill="#BBD153" />
+                    <text x="813" y="39" text-anchor="middle" fill="#22404D" font-family="Montserrat,sans-serif"
+                        font-weight="800" font-size="9">RESULT</text>
+                    <text x="813" y="90" text-anchor="middle" font-size="26">📊</text>
+                    <text x="813" y="120" text-anchor="middle" fill="#22404D" font-family="Work Sans,sans-serif"
+                        font-weight="700" font-size="9.5">High-quality</text>
+                    <text x="813" y="134" text-anchor="middle" fill="#22404D" font-family="Work Sans,sans-serif"
+                        font-weight="700" font-size="9.5">feedback collected</text>
+                    <text x="813" y="156" text-anchor="middle" fill="#667" font-size="8.5">No repeat surveys —</text>
+                    <text x="813" y="170" text-anchor="middle" fill="#667" font-size="8.5">asked once, at the end</text>
+                    <text x="813" y="200" text-anchor="middle" font-size="16">🔁</text>
+                    <text x="813" y="220" text-anchor="middle" fill="#4a5a10" font-family="Work Sans,sans-serif"
+                        font-weight="700" font-size="8.5">Repeats again</text>
+                    <text x="813" y="234" text-anchor="middle" fill="#4a5a10" font-family="Work Sans,sans-serif"
+                        font-weight="700" font-size="8.5">next Friday</text>
+                </g>
+
+                <rect x="16" y="296" width="868" height="30" rx="8" fill="#EEF3F4" />
+                <text x="450" y="316" text-anchor="middle" fill="#285F74" font-family="Work Sans,sans-serif"
+                    font-weight="700" font-size="9.5">🕒 Takes about 15 minutes a week — no new software, just a saved search + bulk email.</text>
+            </svg>
+        </section>
+
+        <!-- ═══ OPTION 4: AUTOMATED SURVEY (CLIENT-FACING) ═══ -->
+        <section class="diagram-block">
+            <span class="block-tag">OPTION 4 · A CYCLE THAT RUNS BY ITSELF</span>
+            <p class="block-intro">
+                Same as Option 3, but nobody has to search or click send. This loop quietly repeats
+                <strong>every night, for every volunteer</strong>, with no admin involved.
+            </p>
+            <div class="caution-banner click-node" data-panel="o4-timeline">
+                <span class="caution-banner-icon" aria-hidden="true">⚠️</span>
+                <span class="caution-banner-text">
+                    <strong>Timeline notice</strong>
+                    Building and testing this automation is extra development work on top of Options 1–3, so
+                    choosing Option 4 is likely to <strong style="display:inline;text-transform:none;letter-spacing:normal;">increase</strong>
+                    the overall project delivery timeline. Tap for details.
+                </span>
+            </div>
+            <svg class="diagram-svg" viewBox="0 0 900 460" xmlns="http://www.w3.org/2000/svg">
+                <rect width="900" height="460" fill="#FAFCFC" />
+                <defs>
+                    <marker id="a4" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto">
+                        <path d="M0,0 L0,6 L7,3 z" fill="#98A6AC" />
+                    </marker>
+                </defs>
+
+                <!-- Loop arrows (pentagon) -->
+                <path d="M482 114 L551 164" fill="none" stroke="#98A6AC" stroke-width="2.5" marker-end="url(#a4)" />
+                <path d="M571 225 L544 305" fill="none" stroke="#98A6AC" stroke-width="2.5" marker-end="url(#a4)" />
+                <path d="M492 343 L408 343" fill="none" stroke="#98A6AC" stroke-width="2.5" marker-end="url(#a4)" />
+                <path d="M356 305 L329 225" fill="none" stroke="#98A6AC" stroke-width="2.5" marker-end="url(#a4)" />
+                <path d="M349 164 L418 114" fill="none" stroke="#98A6AC" stroke-width="2.5" marker-end="url(#a4)" />
+
+                <!-- Center: no admin needed -->
+                <g class="click-node" data-panel="o4-root">
+                    <circle cx="450" cy="228" r="80" fill="white" stroke="#D9534F" stroke-width="2" stroke-dasharray="5,4" />
+                    <use href="#ic-person" x="428" y="188" width="44" height="52" fill="#D9C9C8" />
+                    <line x1="418" y1="200" x2="482" y2="252" stroke="#D9534F" stroke-width="3.5" stroke-linecap="round" />
+                    <text x="450" y="280" text-anchor="middle" fill="#D9534F" font-family="Montserrat,sans-serif"
+                        font-weight="800" font-size="10">No admin work</text>
+                    <text x="450" y="296" text-anchor="middle" fill="#667" font-size="8.5">Runs by itself,</text>
+                    <text x="450" y="309" text-anchor="middle" fill="#667" font-size="8.5">every night</text>
+                </g>
+
+                <!-- Node 1 (top): volunteer logs hours -->
+                <g class="click-node" data-panel="o4-log">
+                    <circle cx="450" cy="90" r="34" fill="#00A0AF" stroke="#C2EDF0" stroke-width="3" />
+                    <use href="#ic-person" x="435" y="72" width="30" height="36" fill="white" />
+                    <text x="450" y="138" text-anchor="middle" fill="#22404D" font-family="Montserrat,sans-serif"
+                        font-weight="800" font-size="9.5">1 · LOGS HOURS</text>
+                    <text x="450" y="152" text-anchor="middle" fill="#667" font-size="8">Same as always</text>
+                </g>
+
+                <!-- Node 2: system checks nightly -->
+                <g class="click-node" data-panel="o4-check">
+                    <circle cx="583" cy="187" r="34" fill="#22404D" stroke="#00A0AF" stroke-width="3" />
+                    <text x="583" y="182" text-anchor="middle" font-size="18">🔁</text>
+                    <text x="640" y="177" text-anchor="start" fill="#22404D" font-family="Montserrat,sans-serif"
+                        font-weight="800" font-size="9.5">2 · SYSTEM CHECKS</text>
+                    <text x="640" y="191" text-anchor="start" fill="#667" font-size="8">Every night, automatically</text>
+                </g>
+
+                <!-- Node 3: 80% reached? -->
+                <g class="click-node" data-panel="o4-milestone">
+                    <circle cx="532" cy="343" r="34" fill="#285F74" stroke="#00A0AF" stroke-width="3" />
+                    <text x="532" y="339" text-anchor="middle" font-size="13" fill="white" font-weight="800">80%</text>
+                    <text x="532" y="396" text-anchor="middle" fill="#22404D" font-family="Montserrat,sans-serif"
+                        font-weight="800" font-size="9.5">3 · MILESTONE HIT?</text>
+                    <text x="532" y="410" text-anchor="middle" fill="#667" font-size="8">If not yet — checked again</text>
+                    <text x="532" y="422" text-anchor="middle" fill="#667" font-size="8">tomorrow, no email sent</text>
+                </g>
+
+                <!-- Node 4: sends email -->
+                <g class="click-node" data-panel="o4-email">
+                    <circle cx="368" cy="343" r="34" fill="#285F74" stroke="#00A0AF" stroke-width="3" />
+                    <text x="368" y="338" text-anchor="middle" font-size="18">✉️</text>
+                    <text x="368" y="396" text-anchor="middle" fill="#22404D" font-family="Montserrat,sans-serif"
+                        font-weight="800" font-size="9.5">4 · SENDS EMAIL</text>
+                    <text x="368" y="410" text-anchor="middle" fill="#667" font-size="8">Friendly survey invite,</text>
+                    <text x="368" y="422" text-anchor="middle" fill="#667" font-size="8">automatically</text>
+                </g>
+
+                <!-- Node 5: volunteer answers -->
+                <g class="click-node" data-panel="o4-survey">
+                    <circle cx="317" cy="187" r="34" fill="#00A0AF" stroke="#C2EDF0" stroke-width="3" />
+                    <use href="#ic-person" x="302" y="169" width="30" height="36" fill="white" />
+                    <text x="260" y="177" text-anchor="end" fill="#22404D" font-family="Montserrat,sans-serif"
+                        font-weight="800" font-size="9.5">5 · ANSWERS SURVEY</text>
+                    <text x="260" y="191" text-anchor="end" fill="#667" font-size="8">Short form, ~2 minutes</text>
+                </g>
+
+                <!-- Outcome callout -->
+                <rect x="200" y="420" width="500" height="34" rx="8" fill="rgba(187,209,83,0.25)" stroke="#BBD153"
+                    stroke-width="1.5" />
+                <text x="450" y="441" text-anchor="middle" dominant-baseline="middle" fill="#4a5a10"
+                    font-family="Work Sans,sans-serif" font-weight="700" font-size="10">📊 Answers land in Better Impact, ready for M&amp;E reporting — no manual step</text>
+            </svg>
+        </section>
+
+    </main>
+
+    <footer class="page-footer">
+        <a href="https://support.betterimpact.com/en/articles/8780736-comprehensive-guide-to-activities"
+            target="_blank" rel="noopener noreferrer">Better Impact — Comprehensive Guide to Activities</a>
+    </footer>
+
+    <div id="print-appendix"></div>
+
+    <!-- Sidebar Modal -->
+    <div class="sidebar-backdrop" id="backdrop"></div>
+    <aside class="sidebar" id="sidebar" aria-hidden="true">
+        <div class="sidebar-header">
+            <div class="sidebar-phase" id="sb-phase"></div>
+            <h2 class="sidebar-title" id="sb-title"></h2>
+            <button class="sidebar-close" id="sidebar-close" aria-label="Close details">×</button>
+        </div>
+        <div class="sidebar-body" id="sb-body"></div>
+    </aside>
+
+    <!-- Screenshot lightbox -->
+    <div class="lightbox" id="lightbox" aria-hidden="true">
+        <button class="lightbox-close" id="lightbox-close" aria-label="Close image">×</button>
+        <img id="lightbox-img" src="" alt="">
+    </div>
+
+    <script>
+        const panels = {
+            'walkthrough-1': {
+                phase: 'Live Portal · Step 1',
+                title: 'Open the Hours Tab',
+                body: `<p>The volunteer opens the <strong>Hours</strong> tab in the portal — the same screen they use every time they log a shift.</p>
+                <ul class="detail-list">
+                    <li><strong>Pick an activity</strong><span>A dropdown lists their recent and active activities.</span></li>
+                    <li><strong>Nothing else shows yet</strong><span>The feedback question only appears after an activity is chosen.</span></li>
+                </ul>`
+            },
+            'walkthrough-2': {
+                phase: 'Live Portal · Step 2',
+                title: 'Log Date & Hours',
+                body: `<p>The volunteer picks their activity and types in how long they worked. As soon as they do, a <strong>Feedback</strong> question appears underneath — no extra screen or click needed.</p>
+                <ul class="detail-list">
+                    <li><strong>Simple entry</strong><span>Just a date, hours, and minutes — e.g. 6 hours on a given day.</span></li>
+                </ul>`
+            },
+            'walkthrough-3': {
+                phase: 'Live Portal · Step 3',
+                title: 'Answer Feedback (Final Shift Only)',
+                body: `<p>On the shift that finishes their commitment, the volunteer sees one quick question — "How satisfied were you?" — and picks a rating. That's the entire feedback ask.</p>
+                <p><span class="status-pill pending">Reminder</span> — under Option 1, this box only shows up on the final shift. Under Option 2, it shows every time but is <em>optional</em> to answer.</p>`
+            },
+            'walkthrough-4': {
+                phase: 'Live Portal · Step 4',
+                title: 'Instant Approval',
+                body: `<p>The volunteer taps <strong>Save</strong> and immediately sees a green <span class="status-pill pass">Created successfully</span> message. Their hours are already marked <span class="status-pill pass">Approved</span> — nobody has to review it.</p>
+                <div class="formula-box">Completion % = <em>(Approved Hours ÷ Committed Hours) × 100</em></div>`
+            },
+            'walkthrough-validation': {
+                phase: 'Live Portal · A problem to avoid',
+                title: 'What Goes Wrong if Feedback is "Required"',
+                body: `<p>If a feedback question is marked <strong>Required</strong>, the volunteer gets stuck: they can't save their hours until they answer it — even on a routine shift where it's not needed yet.</p>
+                <p><strong>The fix:</strong> either turn feedback off on routine logs entirely (<strong>Option 1</strong>), or mark the questions optional so volunteers can skip and save (<strong>Option 2</strong>).</p>`
+            },
+
+            /* ── Option 1 ── */
+            'o1-intro': {
+                phase: 'Option 1 · The Idea',
+                title: 'Match the Rule to the Opportunity',
+                body: `<p>Not every opportunity works the same way, so feedback shouldn't either. Before anything else, ask one simple question:</p>
+                <p style="text-align:center;font-family:'Montserrat',sans-serif;font-weight:800;color:#22404D;">"Is this a one-off event, or a multi-shift program?"</p>
+                <ul class="detail-list">
+                    <li><strong>One-off event</strong><span>Feedback happens on the spot, the one time they log hours.</span></li>
+                    <li><strong>Multi-shift program</strong><span>Feedback waits until they've nearly finished — see the right-hand lane.</span></li>
+                </ul>
+                <span class="status-pill pass">★ Recommended — best fit for most cases</span>`
+            },
+            'o1-oneoff': {
+                phase: 'Option 1 · One-off Events',
+                title: 'e.g. Competition Judge, 1-Day Workshop',
+                body: `<p>These volunteers only show up once, so there's no reason to wait.</p>
+                <ol class="flow-steps">
+                    <li>Feedback questions are turned on for this activity, right on the hour-log screen.</li>
+                    <li>The volunteer logs their hours and answers a couple of quick questions in one go.</li>
+                    <li>Hours are approved instantly and the feedback is saved at the same time.</li>
+                </ol>
+                <span class="status-pill pass">Simplest path — done in one visit</span>`
+            },
+            'o1-multi': {
+                phase: 'Option 1 · Multi-Shift Programs',
+                title: 'e.g. Company Program, Ongoing Mentoring',
+                body: `<p>These volunteers log hours many times over weeks or months — asking for feedback every time would be annoying, so we save it for the end.</p>
+                <ol class="flow-steps">
+                    <li>The feedback question is turned <strong>off</strong> for routine logs — logging hours takes seconds.</li>
+                    <li>Behind the scenes, the system keeps a running total of hours logged.</li>
+                    <li>Once they've logged about <strong>80%</strong> of their committed hours, a feedback survey is sent separately (see Option 3 or Option 4 for how).</li>
+                </ol>
+                <div class="formula-box">80% milestone = <em>Logged Hours ÷ Committed Hours ≥ 0.8</em></div>`
+            },
+
+            /* ── Option 2 ── */
+            'o2-intro': {
+                phase: 'Option 2 · The Idea',
+                title: 'Keep Feedback Optional',
+                body: `<p>Sometimes turning feedback fields off entirely (Option 1) isn't possible in a given activity's setup. When that's the case, there's a simple one-setting fix: make every feedback question <strong>optional</strong> instead of required.</p>
+                <span class="status-pill pending">Use this when Option 1 isn't available</span>`
+            },
+            'o2-required': {
+                phase: 'Option 2 · What to Avoid',
+                title: 'When a Field is "Required"',
+                body: `<p>If a feedback question is marked <strong>Required</strong>, volunteers cannot save their hours until they fill it in — on every single routine shift.</p>
+                <p>This turns a 10-second task into a chore, and volunteers end up rushing or resenting the extra step.</p>
+                <span class="status-pill fail">🚫 Avoid this setup on routine logs</span>`
+            },
+            'o2-optional': {
+                phase: 'Option 2 · The Fix',
+                title: 'Mark It "Optional" Instead',
+                body: `<p>One checkbox change in the activity's settings — uncheck "Required" on each feedback question — and volunteers can save their hours whether or not they answer.</p>
+                <ul class="detail-list">
+                    <li><strong>No blocked saves</strong><span>The form submits instantly either way.</span></li>
+                    <li><strong>Still counts hours</strong><span>Approval and the 80% milestone calculation work exactly the same.</span></li>
+                </ul>
+                <span class="status-pill pass">✅ Recommended fallback setting</span>`
+            },
+            'o2-reminder': {
+                phase: 'Option 2 · A Helpful Touch',
+                title: 'Add a Friendly Reminder',
+                body: `<p>Since the question still appears every time, a short note next to it helps volunteers know what to do:</p>
+                <p style="text-align:center;font-style:italic;color:#556;">"Routine shift? Feel free to skip — answer this only on your final shift."</p>
+                <p>This small piece of copy removes any confusion about when feedback actually matters.</p>`
+            },
+
+            /* ── Option 3 ── */
+            'o3-intro': {
+                phase: 'Option 3 · The Idea',
+                title: 'Admin Sends Surveys Weekly',
+                body: `<p>No new tools needed — an admin does a short, repeatable task once a week using a saved search already built into Better Impact.</p>
+                <span class="status-pill pending">🕒 About 15 minutes a week</span>`
+            },
+            'o3-1': {
+                phase: 'Option 3 · Step 1',
+                title: 'Volunteers Log Hours All Week',
+                body: `<p>Nothing changes for volunteers — they keep logging hours quickly with no survey pop-ups, Monday through Friday.</p>`
+            },
+            'o3-2': {
+                phase: 'Option 3 · Step 2',
+                title: 'Friday: Admin\'s Weekly Reminder',
+                body: `<p>Once a week (Friday works well), the admin sets aside a few minutes to check who's ready for a feedback survey.</p>`
+            },
+            'o3-3': {
+                phase: 'Option 3 · Step 3',
+                title: 'Run the Saved Search',
+                body: `<p>A saved search — already built and ready to reuse — filters for volunteers who've logged <strong>80% or more</strong> of their committed hours and haven't been sent a survey yet.</p>
+                <div class="badge-pill">Logged Hours ≥ 80% AND Survey Sent = No</div>`
+            },
+            'o3-4': {
+                phase: 'Option 3 · Step 4',
+                title: 'Select All & Send Once',
+                body: `<p>The admin selects everyone the search found and sends one bulk email containing a link to the feedback survey — a single click covers the whole list.</p>`
+            },
+            'o3-5': {
+                phase: 'Option 3 · Outcome',
+                title: 'Feedback Collected, Cycle Repeats',
+                body: `<p>Because the survey lands at the end of a volunteer's journey — not after every shift — responses are more thoughtful and complete.</p>
+                <span class="status-pill pass">Zero survey fatigue + high response rate</span>
+                <p><span class="status-pill pending">Still manual</span> — for a hands-free version of this exact process, see <strong>Option 4</strong>.</p>`
+            },
+
+            /* ── Option 4 ── */
+            'o4-root': {
+                phase: 'Option 4 · The Idea',
+                title: 'No Admin Work Needed',
+                body: `<p>This is Option 3's exact process, minus the human step. A small automation checks everyone's hours every night and sends the emails by itself.</p>
+                <ul class="detail-list">
+                    <li><strong>For volunteers</strong><span>Nothing changes — they still just log hours as usual.</span></li>
+                    <li><strong>For admins</strong><span>No weekly search, no bulk-select, no send button to remember.</span></li>
+                    <li><strong>For M&amp;E</strong><span>Answers still land in Better Impact, ready to export.</span></li>
+                </ul>
+                <span class="status-pill pass">Hands-free version of Option 3</span>
+                <p style="margin-top:14px;"><span class="status-pill fail">⚠️ Longer timeline</span> — this option needs custom
+                build work, so it takes more time to deliver than Options 1–3. See the timeline notice above for details.</p>`
+            },
+            'o4-timeline': {
+                phase: 'Option 4 · Timeline Notice',
+                title: 'This Option Takes Longer to Deliver',
+                body: `<p>Options 1–3 use settings and processes that already exist in Better Impact today. Option 4 is different — it requires <strong>new automation to be built, tested, and maintained</strong> before it can run on its own.</p>
+                <ul class="detail-list">
+                    <li><strong>Extra build time</strong><span>Development and testing of the nightly check-and-send automation adds time before go-live.</span></li>
+                    <li><strong>Extra testing</strong><span>Needs to be verified across opportunity types before it's trusted to run unattended.</span></li>
+                    <li><strong>Net effect</strong><span>Expect the overall project delivery timeline to <strong>increase</strong> if this option is chosen.</span></li>
+                </ul>
+                <p><span class="status-pill pending">Trade-off</span> — less ongoing admin effort, in exchange for more upfront delivery time. Options 1–3 can ship sooner and Option 4 can be added later if useful.</p>`
+            },
+            'o4-log': {
+                phase: 'Option 4 · Step 1',
+                title: 'Volunteer Logs Hours',
+                body: `<p>No change to what the volunteer sees or does — same quick hour-logging screen as always, no survey interruptions.</p>`
+            },
+            'o4-check': {
+                phase: 'Option 4 · Step 2',
+                title: 'System Checks Every Night',
+                body: `<p>A background job runs automatically each night. It reviews everyone's logged hours for the opportunities being tracked — no one has to run a search or open a spreadsheet.</p>`
+            },
+            'o4-milestone': {
+                phase: 'Option 4 · Step 3',
+                title: 'Has This Volunteer Hit 80%?',
+                body: `<p>Each volunteer's total logged hours are compared to their committed hours.</p>
+                <div class="formula-box">Example: <em>16 hours logged ÷ 20 committed = 80%</em></div>
+                <p><strong>Not there yet?</strong> Nothing happens — they're simply checked again the next night.<br><strong>At 80% or more?</strong> They move to the next step, and only once per opportunity.</p>`
+            },
+            'o4-email': {
+                phase: 'Option 4 · Step 4',
+                title: 'A Friendly Email Goes Out',
+                body: `<p>The volunteer automatically receives a short, branded email inviting them to share feedback — no admin has to write or click anything.</p>`
+            },
+            'o4-survey': {
+                phase: 'Option 4 · Step 5',
+                title: 'Volunteer Answers a Short Survey',
+                body: `<p>They click through to a short form inside Better Impact — the same platform they already use — and answer a couple of questions in about 2 minutes.</p>
+                <span class="status-pill pass">Report-ready answers, zero manual chasing</span>`
+            }
+        };
+
+        const sidebar = document.getElementById('sidebar');
+        const backdrop = document.getElementById('backdrop');
+        const sbPhase = document.getElementById('sb-phase');
+        const sbTitle = document.getElementById('sb-title');
+        const sbBody = document.getElementById('sb-body');
+        let activeNode = null;
+
+        function openPanel(id, skipHighlight) {
+            const data = panels[id];
+            if (!data) return;
+
+            if (!skipHighlight) {
+                if (activeNode) activeNode.classList.remove('active');
+                activeNode = document.querySelector(`[data-panel="${id}"]`);
+                if (activeNode) activeNode.classList.add('active');
+            }
+
+            sbPhase.textContent = data.phase;
+            sbTitle.textContent = data.title;
+            sbBody.innerHTML = data.body;
+
+            sidebar.classList.add('open');
+            backdrop.classList.add('open');
+            sidebar.setAttribute('aria-hidden', 'false');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closePanel() {
+            sidebar.classList.remove('open');
+            backdrop.classList.remove('open');
+            sidebar.setAttribute('aria-hidden', 'true');
+            document.body.style.overflow = '';
+            if (activeNode) {
+                activeNode.classList.remove('active');
+                activeNode = null;
+            }
+        }
+
+        document.querySelectorAll('.click-node').forEach(node => {
+            node.addEventListener('click', e => {
+                if (e.target.closest('.step-shot, .walkthrough-note img')) return;
+                e.stopPropagation();
+                if (activeNode) activeNode.classList.remove('active');
+                activeNode = e.currentTarget;
+                activeNode.classList.add('active');
+                openPanel(node.dataset.panel, true);
+            });
+        });
+
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImg = document.getElementById('lightbox-img');
+
+        function openLightbox(src, alt) {
+            lightboxImg.src = src;
+            lightboxImg.alt = alt || '';
+            lightbox.classList.add('open');
+            lightbox.setAttribute('aria-hidden', 'false');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLightbox() {
+            lightbox.classList.remove('open');
+            lightbox.setAttribute('aria-hidden', 'true');
+            lightboxImg.src = '';
+            if (!sidebar.classList.contains('open')) {
+                document.body.style.overflow = '';
+            }
+        }
+
+        document.querySelectorAll('.step-shot, .walkthrough-note img').forEach(img => {
+            img.addEventListener('click', e => {
+                e.stopPropagation();
+                openLightbox(img.src, img.alt);
+            });
+        });
+
+        document.getElementById('lightbox-close').addEventListener('click', closeLightbox);
+        lightbox.addEventListener('click', e => {
+            if (e.target === lightbox) closeLightbox();
+        });
+
+        document.getElementById('sidebar-close').addEventListener('click', closePanel);
+        backdrop.addEventListener('click', closePanel);
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') {
+                if (lightbox.classList.contains('open')) closeLightbox();
+                else closePanel();
+            }
+        });
+
+        function downloadPdf() {
+            const appendix = document.getElementById('print-appendix');
+            appendix.innerHTML = '<h2>DeJAVU Feedback Architecture — Details</h2>' +
+                Object.values(panels).map(p =>
+                    `<section style="margin-bottom:1.2em;page-break-inside:avoid"><h3>${p.phase}: ${p.title}</h3>${p.body}</section>`
+                ).join('');
+            window.print();
+        }
+    </script>
+</body>
+</html>
