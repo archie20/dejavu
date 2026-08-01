@@ -862,6 +862,27 @@
             .diagram-block { break-inside: avoid; }
             .walkthrough-step { break-inside: avoid; }
             body { background: white; }
+
+            /* Keep the executive context section identical to on-screen:
+               preserve backgrounds, tints, borders, and the gradient top bar */
+            .exec-overview,
+            .exec-overview *,
+            .diagram-block,
+            .diagram-block::before,
+            .block-tag,
+            .exec-badge,
+            .exec-panel,
+            .exec-panel li,
+            .exec-purpose {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
+            .exec-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+            }
+
+            .exec-overview { break-inside: avoid; }
         }
     </style>
 </head>
