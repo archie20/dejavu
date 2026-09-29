@@ -1,0 +1,456 @@
+/* DeJAVU user guides — printable, SPES-style numbered walkthrough */
+
+:root {
+    --boundless-blue: #285F74;
+    --resilient-turquoise: #00A0AF;
+    --gritty-green: #BBD153;
+    --optimistic-ice: #C2EDF0;
+    --immersive-blue-black: #22404D;
+    --off-white: #EEF3F4;
+    --pure-white: #FFFFFF;
+    --body-muted: #4a5a62;
+    --page-max: 820px;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Work Sans', sans-serif;
+    background: var(--off-white);
+    color: var(--immersive-blue-black);
+    margin: 0;
+    line-height: 1.55;
+}
+
+h1, h2, h3 {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+}
+
+/* ── On-screen chrome ── */
+
+.top-bar {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    background: var(--immersive-blue-black);
+    color: var(--pure-white);
+    border-bottom: 4px solid var(--resilient-turquoise);
+}
+
+.top-bar-inner {
+    max-width: var(--page-max);
+    margin: 0 auto;
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    color: inherit;
+}
+
+.brand h1 {
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+.brand h1 span {
+    color: var(--resilient-turquoise);
+}
+
+.pdf-btn {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 0.78rem;
+    background: var(--resilient-turquoise);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 14px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.pdf-btn:hover {
+    background: var(--gritty-green);
+    color: var(--immersive-blue-black);
+}
+
+/* ── Guide document ── */
+
+.guide {
+    max-width: var(--page-max);
+    margin: 0 auto;
+    padding: 36px 24px 64px;
+}
+
+.guide-header {
+    margin-bottom: 36px;
+    padding-bottom: 20px;
+    border-bottom: 3px solid var(--optimistic-ice);
+}
+
+.guide-header .eyebrow {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--resilient-turquoise);
+    margin: 0 0 8px;
+}
+
+.guide-header h2 {
+    margin: 0 0 10px;
+    font-size: 1.75rem;
+    color: var(--immersive-blue-black);
+}
+
+.guide-header .audience {
+    display: inline-block;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 0.72rem;
+    background: var(--optimistic-ice);
+    color: var(--boundless-blue);
+    padding: 4px 10px;
+    border-radius: 4px;
+    margin-bottom: 12px;
+}
+
+.guide-header .lede {
+    margin: 0;
+    color: var(--body-muted);
+    font-size: 1.02rem;
+    max-width: 38em;
+}
+
+.portal-link {
+    margin-top: 12px;
+    font-size: 0.9rem;
+}
+
+.portal-link a {
+    color: var(--resilient-turquoise);
+    font-weight: 600;
+}
+
+
+/* ── Numbered steps (SPES-style) ── */
+
+.steps {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+}
+
+.step {
+    display: grid;
+    grid-template-columns: 64px 1fr;
+    gap: 8px 18px;
+    break-inside: avoid;
+}
+
+.step-num {
+    grid-row: 1 / span 2;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    font-size: 2.75rem;
+    line-height: 1;
+    color: var(--resilient-turquoise);
+    text-align: center;
+    padding-top: 2px;
+}
+
+.step-title {
+    margin: 0;
+    font-size: 1.2rem;
+    color: var(--immersive-blue-black);
+    align-self: end;
+}
+
+.step-body {
+    grid-column: 2;
+}
+
+.step-body p {
+    margin: 0 0 10px;
+    color: var(--body-muted);
+    font-size: 0.98rem;
+}
+
+.step-body p:last-child {
+    margin-bottom: 0;
+}
+
+.step-body a {
+    color: var(--boundless-blue);
+    font-weight: 600;
+}
+
+.aside {
+    margin: 12px 0 0;
+    padding: 10px 14px;
+    background: var(--optimistic-ice);
+    border-left: 4px solid var(--resilient-turquoise);
+    border-radius: 0 6px 6px 0;
+    color: var(--immersive-blue-black);
+    font-size: 0.92rem;
+}
+
+/* ── Annotated screenshot ── */
+
+.shot {
+    position: relative;
+    margin-top: 16px;
+    background: var(--pure-white);
+    border: 1px solid #d5e0e4;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 18px rgba(34, 64, 77, 0.08);
+}
+
+.shot img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.shot-frame {
+    position: relative;
+}
+
+/* Callout labels over screenshots — place with --x / --y (% of frame) */
+.callout {
+    position: absolute;
+    left: var(--x, 50%);
+    top: var(--y, 50%);
+    transform: translate(-50%, -50%);
+    max-width: 11em;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 0.72rem;
+    line-height: 1.25;
+    text-align: center;
+    color: var(--immersive-blue-black);
+    background: rgba(194, 237, 240, 0.95);
+    border: 2px solid var(--resilient-turquoise);
+    border-radius: 6px;
+    padding: 6px 8px;
+    box-shadow: 0 2px 8px rgba(34, 64, 77, 0.12);
+    pointer-events: none;
+    z-index: 2;
+}
+
+.callout.dark {
+    background: rgba(34, 64, 77, 0.92);
+    color: var(--pure-white);
+    border-color: var(--immersive-blue-black);
+}
+
+.callout::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: -10px;
+    transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-top-color: var(--resilient-turquoise);
+}
+
+.callout.dark::after {
+    border-top-color: var(--immersive-blue-black);
+}
+
+.callout.point-up::after {
+    bottom: auto;
+    top: -10px;
+    border-top-color: transparent;
+    border-bottom-color: var(--resilient-turquoise);
+}
+
+.callout.dark.point-up::after {
+    border-bottom-color: var(--immersive-blue-black);
+}
+
+.callout-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 14px;
+    margin-top: 12px;
+}
+
+.callout-list span {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 0.75rem;
+    color: var(--boundless-blue);
+}
+
+.callout-list span::before {
+    content: '→ ';
+    color: var(--resilient-turquoise);
+}
+
+/* ── Closing / help block ── */
+
+.help-block {
+    margin-top: 48px;
+    padding: 22px 24px;
+    background: var(--pure-white);
+    border: 2px solid var(--optimistic-ice);
+    border-radius: 12px;
+    break-inside: avoid;
+}
+
+.help-block h3 {
+    margin: 0 0 8px;
+    font-size: 1.05rem;
+}
+
+.help-block p {
+    margin: 0;
+    color: var(--body-muted);
+}
+
+.page-footer {
+    text-align: center;
+    padding: 28px 24px 40px;
+    font-size: 0.78rem;
+    color: #889;
+}
+
+.page-footer a {
+    color: var(--resilient-turquoise);
+}
+
+/* ── Guides index ── */
+
+.guides-index .intro {
+    margin-bottom: 28px;
+}
+
+.guides-index .intro h2 {
+    margin: 0 0 8px;
+    font-size: 1.5rem;
+}
+
+.guides-index .intro p {
+    margin: 0;
+    color: var(--body-muted);
+}
+
+.guide-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.guide-card {
+    display: block;
+    background: var(--pure-white);
+    border-radius: 12px;
+    padding: 20px 22px;
+    text-decoration: none;
+    color: inherit;
+    border: 2px solid var(--optimistic-ice);
+    transition: border-color 0.2s, transform 0.2s;
+}
+
+.guide-card:hover {
+    border-color: var(--resilient-turquoise);
+    transform: translateY(-2px);
+}
+
+.guide-card h3 {
+    margin: 0 0 4px;
+    font-size: 1.05rem;
+}
+
+.guide-card p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--body-muted);
+}
+
+.guide-card .meta {
+    margin-top: 8px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 0.72rem;
+    color: var(--resilient-turquoise);
+}
+
+.empty-note {
+    padding: 28px 24px;
+    background: var(--pure-white);
+    border: 2px dashed var(--optimistic-ice);
+    border-radius: 12px;
+    color: var(--body-muted);
+    text-align: center;
+}
+
+/* ── Print ── */
+
+@media print {
+    body {
+        background: white;
+    }
+
+    .top-bar,
+    .pdf-btn {
+        display: none !important;
+    }
+
+    .guide {
+        max-width: none;
+        padding: 0;
+    }
+
+    .step,
+    .shot,
+    .help-block {
+        break-inside: avoid;
+    }
+
+    .shot,
+    .callout,
+    .aside,
+    .guide-header,
+    .step-num {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    .page-footer a::after {
+        content: ' (' attr(href) ')';
+        font-size: 0.7rem;
+    }
+}
+
+@media (max-width: 560px) {
+    .step {
+        grid-template-columns: 44px 1fr;
+        gap: 4px 12px;
+    }
+
+    .step-num {
+        font-size: 2rem;
+    }
+
+    .guide-header h2 {
+        font-size: 1.35rem;
+    }
+}

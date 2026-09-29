@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeJAVU — Enterprise &amp; Sub-Accounts</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&family=Work+Sans:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+    <div class="top-bar">
+        <div class="top-bar-inner">
+            <a class="brand" href="index.html">
+                <svg width="32" height="32" viewBox="0 0 100 100" aria-hidden="true">
+                    <polygon points="50,5 95,50 50,95 5,50" fill="#00A0AF" />
+                    <polygon points="50,5 72.5,27.5 50,50 27.5,27.5" fill="#285F74" opacity="0.8" />
+                </svg>
+                <h1>DeJAVU <span>Admin Guide</span></h1>
+            </a>
+            <button type="button" class="pdf-btn" onclick="window.print()">Print / Save as PDF</button>
+        </div>
+    </div>
+
+    <article class="guide">
+        <header class="guide-header">
+            <p class="eyebrow">Admin guide</p>
+            <span class="audience">Audience · Administrator</span>
+            <h2>Enterprise &amp; Sub-Accounts</h2>
+            <p class="lede">
+                DeJAVU sits under a Better Impact <strong>Enterprise</strong> account.
+                After admin login you choose which organisation (sub-account) to work in.
+            </p>
+            <p class="portal-link">Admin portal:
+                <a href="https://app.betterimpact.com/Login/Admin" target="_blank"
+                    rel="noopener noreferrer">app.betterimpact.com/Login/Admin</a>
+            </p>
+        </header>
+
+        <div class="steps">
+
+            <section class="step">
+                <div class="step-num" aria-hidden="true">1</div>
+                <h3 class="step-title">What you see after login</h3>
+                <div class="step-body">
+                    <p>
+                        Admins with access to more than one organisation land on
+                        <strong>Select an Enterprise Account</strong>.
+                        Choose the enterprise, then open the sub-account you need.
+                    </p>
+                    <div class="shot">
+                        <div class="shot-frame">
+                            <img src="assets/admin-enterprise-accounts/step-01-account-selection.png"
+                                alt="Account selection showing Junior Achievement Africa enterprise and DeJAVU sub-accounts">
+                            <span class="callout" style="--x: 50%; --y: 28%;">Enterprise</span>
+                            <span class="callout dark" style="--x: 55%; --y: 62%;">Sub-accounts</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="step">
+                <div class="step-num" aria-hidden="true">2</div>
+                <h3 class="step-title">JA Africa layout (Phase 1)</h3>
+                <div class="step-body">
+                    <p>
+                        <strong>Enterprise account:</strong> Junior Achievement Africa —
+                        the umbrella for DeJAVU organisations.
+                    </p>
+                    <p>
+                        <strong>Main organisation (Phase 1):</strong>
+                        <strong>JA Africa Volunteer University</strong>.
+                        Use this account to create opportunities, accept new volunteer signups,
+                        and run day-to-day volunteer management.
+                    </p>
+                    <p>
+                        By default, volunteers who apply via
+                        <a href="https://volunteers.ja-africa.org/" target="_blank"
+                            rel="noopener noreferrer">volunteers.ja-africa.org</a>
+                        join the <strong>JA Africa Volunteer University</strong> organisation.
+                    </p>
+                    <p class="aside">
+                        Other sub-accounts already listed (for example DeJAVU Nigeria and DeJAVU – Rwanda)
+                        appear here only if your admin profile has access to them.
+                        In Phase 2, more country and corporate-partner organisations will show the same way.
+                    </p>
+                </div>
+            </section>
+
+            <section class="step">
+                <div class="step-num" aria-hidden="true">3</div>
+                <h3 class="step-title">Other options (Better Impact)</h3>
+                <div class="step-body">
+                    <p>
+                        In Better Impact, an <strong>Enterprise account</strong> is an umbrella that can
+                        contain multiple organisation sub-accounts (branches, locations, departments, or regions).
+                        Each sub-account has its own volunteers, activities, and settings.
+                    </p>
+                    <p>Beyond the Phase 1 default, Better Impact also supports:</p>
+                    <ul>
+                        <li>
+                            Working only in one organisation if your admin access is limited to that sub-account
+                        </li>
+                        <li>
+                            Opening the <strong>Enterprise</strong> account itself for cross-organisation monitoring
+                            (statuses, hours, schedules) when you have Enterprise admin rights
+                        </li>
+                        <li>
+                            Optional enterprise features (for example shared branding, note/email visibility across
+                            sub-accounts, or Regions) — usually enabled by Better Impact Support on request
+                        </li>
+                        <li>
+                            Adding further sub-accounts later (billing contact or Enterprise Primary Admin contacts Support)
+                        </li>
+                    </ul>
+                    <p class="aside">
+                        Reference:
+                        <a href="https://support.betterimpact.com/en/articles/8429306-account-set-up-where-to-start-enterprise-considerations"
+                            target="_blank" rel="noopener noreferrer">Account set-up: Enterprise considerations</a>
+                        ·
+                        <a href="https://support.betterimpact.com/en/articles/8429308-account-set-up-optional-enterprise-features"
+                            target="_blank" rel="noopener noreferrer">Optional enterprise features</a>
+                    </p>
+                </div>
+            </section>
+
+        </div>
+
+        <aside class="help-block">
+            <h3>Encountering issues?</h3>
+            <p>
+                Do not change Configuration settings unless you have been asked to.
+                For Phase 1 work, open <strong>JA Africa Volunteer University</strong> after login.
+                Contact the Digital team if you cannot access the right account.
+            </p>
+        </aside>
+    </article>
+
+    <footer class="page-footer">
+        Project DeJAVU · JA Africa Regional Volunteer Platform ·
+        <a href="https://volunteers.ja-africa.org/">volunteers.ja-africa.org</a>
+    </footer>
+
+</body>
+
+</html>

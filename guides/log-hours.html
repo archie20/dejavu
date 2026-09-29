@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeJAVU — Log Your Hours</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&family=Work+Sans:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+    <div class="top-bar">
+        <div class="top-bar-inner">
+            <a class="brand" href="index.html">
+                <svg width="32" height="32" viewBox="0 0 100 100" aria-hidden="true">
+                    <polygon points="50,5 95,50 50,95 5,50" fill="#00A0AF" />
+                    <polygon points="50,5 72.5,27.5 50,50 27.5,27.5" fill="#285F74" opacity="0.8" />
+                </svg>
+                <h1>DeJAVU <span>User Guide</span></h1>
+            </a>
+            <button type="button" class="pdf-btn" onclick="window.print()">Print / Save as PDF</button>
+        </div>
+    </div>
+
+    <article class="guide">
+        <header class="guide-header">
+            <p class="eyebrow">Volunteer guide</p>
+            <span class="audience">Audience · Volunteer</span>
+            <h2>Log Your Hours</h2>
+            <p class="lede">
+                After you volunteer, record the time you spent so DeJAVU can track your impact.
+                Open <strong>Hours</strong> from the top menu any time you are logged in.
+            </p>
+            <p class="portal-link">Path:
+                <strong>Hours</strong>
+            </p>
+        </header>
+
+        <div class="steps">
+
+            <section class="step">
+                <div class="step-num" aria-hidden="true">1</div>
+                <h3 class="step-title">Open Hours</h3>
+                <div class="step-body">
+                    <p>
+                        Sign in to DeJAVU. On your home page, click <strong>Hours</strong> in the top menu.
+                    </p>
+                    <div class="shot">
+                        <div class="shot-frame">
+                            <img src="assets/log-hours/step-01-home.png"
+                                alt="Home page with Hours tab in the main menu">
+                            <span class="callout" style="--x: 48%; --y: 28%;">Hours</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="step">
+                <div class="step-num" aria-hidden="true">2</div>
+                <h3 class="step-title">Choose the activity</h3>
+                <div class="step-body">
+                    <p>
+                        Under <strong>Log Hours</strong>, use the Activity dropdown to select the opportunity
+                        you volunteered for. Use <strong>Active</strong> or <strong>Inactive</strong> above the
+                        list if you need to show a different set of activities.
+                    </p>
+                    <div class="shot">
+                        <div class="shot-frame">
+                            <img src="assets/log-hours/step-02-hours-form.png"
+                                alt="Log Hours form with Activity dropdown, date, hours, and minutes">
+                            <span class="callout" style="--x: 55%; --y: 48%;">Select activity</span>
+                        </div>
+                    </div>
+                    <p class="aside">
+                        Your list only shows activities available to you. If an opportunity is missing,
+                        contact your country volunteer coordinator.
+                    </p>
+                </div>
+            </section>
+
+            <section class="step">
+                <div class="step-num" aria-hidden="true">3</div>
+                <h3 class="step-title">Enter date and time</h3>
+                <div class="step-body">
+                    <p>
+                        Set <strong>Date Volunteered</strong> to the day you helped (use the calendar icon if needed).
+                        Enter <strong>Hours</strong> and <strong>Minutes</strong> for the time you spent.
+                    </p>
+                    <p>
+                        If the activity asks feedback questions on this page, answer them before saving.
+                        You can tick <strong>Keep Feedback Fields Populated</strong> if you log several similar entries.
+                    </p>
+                    <div class="shot">
+                        <div class="shot-frame">
+                            <img src="assets/log-hours/step-03-filled.png"
+                                alt="Hours form filled with activity, date, and 1 hour">
+                            <span class="callout" style="--x: 28%; --y: 68%;">Hours &amp; minutes</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="step">
+                <div class="step-num" aria-hidden="true">4</div>
+                <h3 class="step-title">Save your entry</h3>
+                <div class="step-body">
+                    <p>
+                        Click <strong>Save</strong> when you are done, or
+                        <strong>Save and Log Another</strong> if you have more time to record.
+                    </p>
+                    <p>
+                        Your entry appears under <strong>Most Recent Entries</strong> with the hours,
+                        dates, and status (for example <strong>Approved</strong>). Use <strong>View</strong>
+                        to open the details.
+                    </p>
+                    <div class="shot">
+                        <div class="shot-frame">
+                            <img src="assets/log-hours/step-04-saved.png"
+                                alt="Most Recent Entries table showing a saved hours entry with Approved status">
+                            <span class="callout" style="--x: 55%; --y: 88%;">Most Recent Entries</span>
+                        </div>
+                    </div>
+                    <p class="aside">
+                        You generally cannot edit hours after saving. You may delete an entry within about
+                        24 hours; after that, ask your coordinator if a correction is needed.
+                    </p>
+                </div>
+            </section>
+
+        </div>
+
+        <aside class="help-block">
+            <h3>After you log enough hours</h3>
+            <p>
+                If you complete an opportunity and log at least the minimum required hours for that
+                opportunity, you will receive a feedback survey email about the opportunity.
+                Check your inbox (and spam folder) after your hours are recorded.
+            </p>
+        </aside>
+
+        <aside class="help-block">
+            <h3>Encountering issues?</h3>
+            <p>
+                If Hours will not save, an activity is missing from the list, or your status stays pending,
+                contact your country volunteer coordinator for help.
+            </p>
+        </aside>
+    </article>
+
+    <footer class="page-footer">
+        Project DeJAVU · JA Africa Regional Volunteer Platform ·
+        <a href="https://volunteers.ja-africa.org/">volunteers.ja-africa.org</a>
+    </footer>
+
+</body>
+
+</html>
