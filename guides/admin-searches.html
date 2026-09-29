@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeJAVU — Searches (Skills Survey / Custom Fields)</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&family=Work+Sans:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+    <div class="top-bar">
+        <div class="top-bar-inner">
+            <a class="brand" href="index.html">
+                <svg width="32" height="32" viewBox="0 0 100 100" aria-hidden="true">
+                    <polygon points="50,5 95,50 50,95 5,50" fill="#00A0AF" />
+                    <polygon points="50,5 72.5,27.5 50,50 27.5,27.5" fill="#285F74" opacity="0.8" />
+                </svg>
+                <h1>DeJAVU <span>Admin Guide</span></h1>
+            </a>
+            <button type="button" class="pdf-btn" onclick="window.print()">Print / Save as PDF</button>
+        </div>
+    </div>
+
+    <article class="guide">
+        <header class="guide-header">
+            <p class="eyebrow">Admin guide</p>
+            <span class="audience">Audience · Administrator</span>
+            <h2>Searches — Skills Survey (Custom Fields)</h2>
+            <p class="lede">
+                Find volunteers by Skills Survey answers using
+                <strong>People → Search</strong> and the
+                <strong>Custom Fields</strong> search type. Filter by skill level (1–5)
+                and by support-area checkboxes, then save, pin, or share the search for reuse.
+            </p>
+            <p class="portal-link">Path:
+                <strong>People → Search</strong>
+                · Docs:
+                <a href="https://support.betterimpact.com/en/articles/9977126-comprehensive-guide-to-searches"
+                    target="_blank" rel="noopener noreferrer">BI comprehensive guide to searches</a>
+            </p>
+        </header>
+
+        <div class="steps">
+
+            <section class="step">
+                <div class="step-num" aria-hidden="true">1</div>
+                <h3 class="step-title">Open People Search</h3>
+                <div class="step-body">
+                    <p>
+                        Switch into <strong>JA Africa Volunteer University</strong>. Click the
+                        <strong>People</strong> icon in the top bar, then
+                        <strong>Search</strong> in the sidebar.
+                    </p>
+                    <p>
+                        Under Module and Status Filters, keep <strong>Volunteer</strong> selected
+                        and tick the statuses you need (for day-to-day matching, use
+                        <strong>Accepted</strong>). Leave Communications Filters on Don’t Filter
+                        unless you only want people with (or without) email.
+                    </p>
+                    <div class="shot">
+                        <div class="shot-frame">
+                            <img src="assets/admin-searches/step-01-people-search.png"
+                                alt="People Search page with Volunteer Accepted status selected">
+                            <span class="callout" style="--x: 48%; --y: 38%;">Accepted</span>
+                        </div>
+                    </div>
+                    <p class="aside">
+                        Status filters always apply before search criteria. A saved Skills Survey
+                        search still respects whatever statuses you had ticked when you saved it.
+                    </p>
+                </div>
+            </section>
+
+            <section class="step">
+                <div class="step-num" aria-hidden="true">2</div>
+                <h3 class="step-title">Add Search Criteria</h3>
+                <div class="step-body">
+                    <p>
+                        Click <strong>Add Search Criteria</strong>. In the dialog, set
+                        <strong>Search Type</strong> to <strong>Custom Fields</strong>.
+                        That is how Better Impact exposes the Skills Survey answers volunteers
+                        complete under My Profile → Additional Info.
+                    </p>
+                    <div class="shot">
+                        <div class="shot-frame">
+                            <img src="assets/admin-searches/step-02-add-search-criteria.png"
+                                alt="Add Search Criteria dialog with Search Type Custom Fields">
+                            <span class="callout" style="--x: 42%; --y: 28%;">Custom Fields</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="step">
+                <div class="step-num" aria-hidden="true">3</div>
+                <h3 class="step-title">Filter by a skill level</h3>
+                <div class="step-body">
+                    <p>
+                        Under <strong>Header</strong>, pick a skill area (for example
+                        <strong>Financial Literacy</strong>). Under <strong>Custom Field</strong>,
+                        choose the level field (e.g. Financial Literacy Level). Set
+                        <strong>Match Type</strong> (Is equal to, Is greater than or equal to, and so on)
+                        and the value (1–5, shown with labels such as Proficient for 4).
+                    </p>
+                    <div class="shot">
+                        <div class="shot-frame">
+                            <img src="assets/admin-searches/step-03-skills-survey-custom-field.png"
+                                alt="Custom field criteria for Financial Literacy Level equal to Proficient">
+                            <span class="callout" style="--x: 55%; --y: 58%;">Level = Proficient</span>
+                        </div>
+                    </div>
+                    <p>
+                        The Header list mirrors the Skills Survey sections: Financial Literacy,
+                        Entrepreneurship, Career Readiness, Digital Literacy, Facilitation and
+                        Presentation, Mentoring and Coaching, Engaging Youth, Problem Solving,
+                        Collaboration and Teamwork, Commitment and Reliability, plus the support-areas header.
+                    </p>
+                    <div class="shot">
+                        <div class="shot-frame">
+                            <img src="assets/admin-searches/step-03b-skills-headers.png"
+                                alt="Header dropdown listing Skills Survey custom field categories">
+                            <span class="callout" style="--x: 48%; --y: 45%;">Skills headers</span>
+                        </div>
+                    </div>
+                    <p>
+                        Click <strong>Add and Go</strong> (or Add, then Search) to run. Results show
+                        matching people and their volunteer status.
+                    </p>
+                    <div class="shot">
+                        <div class="shot-frame">
+                            <img src="assets/admin-searches/step-04-skills-search-results.png"
+                                alt="Search results for Financial Literacy Level Proficient">
+                            <span class="callout" style="--x: 55%; --y: 72%;">Matching people</span>
+                        </div>
+                    </div>
+                    <p class="aside">
+                        Use “greater than or equal to” when you want everyone at a minimum level
+                        (e.g. 3+) rather than an exact score.
+                    </p>
+                </div>
+            </section>
+
+            <section class="step">
+                <div class="step-num" aria-hidden="true">4</div>
+                <h3 class="step-title">Filter by support areas (checkboxes)</h3>
+                <div class="step-body">
+                    <p>
+                        Click <strong>Add Search Criteria</strong> again. Keep Search Type as
+                        Custom Fields. Set Header to
+                        <strong>Which area(s) would you most like to support? (Select all that apply)</strong>.
+                        Choose a Custom Field such as Financial Literacy, Mentorship, or Guest Speaking,
+                        then Match Type <strong>Is checked</strong> (or Is not checked).
+                    </p>
+                    <div class="shot">
+                        <div class="shot-frame">
+                            <img src="assets/admin-searches/step-05-support-area-checked.png"
+                                alt="Support area checkbox criteria with Is checked match type">
+                            <span class="callout" style="--x: 52%; --y: 48%;">Is checked</span>
+                        </div>
+                    </div>
+                    <p>
+                        Under Match Type for multiple criteria, choose
+                        <strong>Include people who match ALL of the above</strong> (AND) or
+                        <strong>ANY</strong> (OR). Example: proficient in Financial Literacy
+                        <em>and</em> willing to support Financial Literacy.
+                    </p>
+                    <div class="shot">
+                        <div class="shot-frame">
+                            <img src="assets/admin-searches/step-06-combined-results.png"
+                                alt="Combined skill level and support area criteria with two results">
+                            <span class="callout" style="--x: 48%; --y: 28%;">ALL of the above</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="step">
+                <div class="step-num" aria-hidden="true">5</div>
+                <h3 class="step-title">Save, pin, and share</h3>
+                <div class="step-body">
+                    <p>
+                        With criteria set, click <strong>Save</strong>. Name the search clearly
+                        (e.g. “FL Level 4+ &amp; support FL”). Optionally tick
+                        <strong>Pin Search</strong> (shows on your Home pinned searches) and
+                        <strong>Share this Saved Search</strong> (other admins in this org can load it).
+                    </p>
+                    <div class="shot">
+                        <div class="shot-frame">
+                            <img src="assets/admin-searches/step-07-save-search.png"
+                                alt="Save User Search dialog with name, pin, and share options">
+                            <span class="callout" style="--x: 42%; --y: 22%;">Name · Pin · Share</span>
+                        </div>
+                    </div>
+                    <p>
+                        Later: use <strong>Load a saved search</strong> at the top of Search, then
+                        Load and Go. Use <strong>Manage Saved Searches</strong> to rename, pin/unpin,
+                        share, or delete. Saved searches stay in the menu where you created them
+                        (People Search is separate from Communicate or Reports).
+                    </p>
+                    <p class="aside">
+                        Shared searches do not cross from Enterprise into Volunteer University
+                        (or the reverse). Pin a shared search only if the whole team should see it
+                        on Home — pinning/unpinning a shared search affects everyone with access.
+                    </p>
+                </div>
+            </section>
+
+        </div>
+
+        <aside class="help-block">
+            <h3>Encountering issues?</h3>
+            <p>
+                Confirm you are in JA Africa Volunteer University and that Volunteer + Accepted
+                (or the statuses you need) are ticked. If Skills Survey fields are missing from
+                the Header list, the volunteer may not have completed Additional Info yet.
+                Contact the Digital team if Custom Fields search is unavailable for your role
+                or shared searches do not appear for other admins.
+            </p>
+        </aside>
+    </article>
+
+    <footer class="page-footer">
+        Project DeJAVU · JA Africa Regional Volunteer Platform ·
+        <a href="index.html">Back to guides</a>
+    </footer>
+
+</body>
+
+</html>

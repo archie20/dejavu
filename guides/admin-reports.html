@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeJAVU — Reports (Hours Logged)</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&family=Work+Sans:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+    <div class="top-bar">
+        <div class="top-bar-inner">
+            <a class="brand" href="index.html">
+                <svg width="32" height="32" viewBox="0 0 100 100" aria-hidden="true">
+                    <polygon points="50,5 95,50 50,95 5,50" fill="#00A0AF" />
+                    <polygon points="50,5 72.5,27.5 50,50 27.5,27.5" fill="#285F74" opacity="0.8" />
+                </svg>
+                <h1>DeJAVU <span>Admin Guide</span></h1>
+            </a>
+            <button type="button" class="pdf-btn" onclick="window.print()">Print / Save as PDF</button>
+        </div>
+    </div>
+
+    <article class="guide">
+        <header class="guide-header">
+            <p class="eyebrow">Admin guide</p>
+            <span class="audience">Audience · Administrator</span>
+            <h2>Reports — Hours Logged</h2>
+            <p class="lede">
+                Use the Reports menu in <strong>JA Africa Volunteer University</strong> to see hours
+                by volunteer, by activity, or as a detailed raw data export. Set a date range,
+                filter by category or volunteer group, then View on screen or Export to Excel / PDF.
+                Only <strong>approved</strong> hours appear on reports.
+            </p>
+            <p class="portal-link">Path:
+                <strong>Reports → Hours Reports</strong>
+                · Docs:
+                <a href="https://support.betterimpact.com/en/articles/12082690-comprehensive-guide-to-reporting"
+                    target="_blank" rel="noopener noreferrer">BI comprehensive guide to reporting</a>
+            </p>
+        </header>
+
+        <div class="steps">
+
+            <section class="step">
+                <div class="step-num" aria-hidden="true">1</div>
+                <h3 class="step-title">Open Hours Reports</h3>
+                <div class="step-body">
+                    <p>
+                        Switch into <strong>JA Africa Volunteer University</strong>. Click the
+                        <strong>Reports</strong> icon in the top bar (chart). In the sidebar under
+                        <strong>Hours Reports</strong> you will see options such as Hours by Volunteer,
+                        Hours by Activity, Hours by Category, Activity Hours by Volunteer, and
+                        Logged Hours Raw Data.
+                    </p>
+                    <div class="shot">
+                        <div class="shot-frame">
+                            <img src="assets/admin-reports/step-01-reports-menu.png"
+                                alt="Reports sidebar with Hours Reports expanded in JA Africa Volunteer University">
+                            <span class="callout" style="--x: 18%; --y: 42%;">Hours Reports</span>
+                        </div>
+                    </div>
+                    <p class="aside">
+                        <strong>JA Africa tip:</strong> Day-to-day hour totals are run in the organisation
+                        account. Enterprise can also use Hours by Activity Report Group when activities
+                        share report groups across countries.
+                    </p>
+                </div>
+            </section>
+
+            <section class="step">
+                <div class="step-num" aria-hidden="true">2</div>
+                <h3 class="step-title">Hours by Volunteer</h3>
+                <div class="step-body">
+                    <p>
+                        Choose <strong>Hours by Volunteer</strong> for totals per person in a date range.
+                        Under Report Settings pick Export File Format (PDF, Word, Excel), Sort
+                        (Number of hours or Last name), and whether to include everyone who logged hours
+                        or only those with at least X hours.
+                    </p>
+                    <p>
+                        Set the <strong>Date Range</strong>, then click <strong>View Report</strong>
+                        (on screen) or <strong>Export Report</strong> (download).
+                    </p>
+                    <div class="shot">
+                        <div class="shot-frame">
+                            <img src="assets/admin-reports/step-02-hours-by-volunteer-settings.png"
+                                alt="Hours by Volunteer report settings with date range and minimum hours">
+                            <span class="callout" style="--x: 48%; --y: 62%;">Date range</span>
+                        </div>
+                    </div>
+                    <p>
+                        The results list each volunteer with <strong>Hours</strong> and
+                        <strong>Entries</strong> for that period.
+                    </p>
+                    <div class="shot">
+                        <div class="shot-frame">
+                            <img src="assets/admin-reports/step-03-hours-by-volunteer-results.png"
+                                alt="Hours by Volunteer results table with hours and entries per person">
+                            <span class="callout" style="--x: 55%; --y: 78%;">Totals by person</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="step">
+                <div class="step-num" aria-hidden="true">3</div>
+                <h3 class="step-title">Hours by Activity</h3>
+                <div class="step-body">
+                    <p>
+                        Choose <strong>Hours by Activity</strong> to see time against each opportunity,
+                        grouped by category (Hybrid, In-Person, Online). Sort by category name, activity
+                        name, hours, or number of volunteers. Set the date range, then View or Export.
+                    </p>
+                    <div class="shot">
+                        <div class="shot-frame">
+                            <img src="assets/admin-reports/step-04-hours-by-activity-settings.png"
+                                alt="Hours by Activity report settings">
+                            <span class="callout" style="--x: 22%; --y: 38%;">Hours by Activity</span>
+                        </div>
+                    </div>
+                    <p>
+                        Results show Category, Activity, Hours, Volunteers, and Average, plus category
+                        and grand totals.
+                    </p>
+                    <div class="shot">
+                        <div class="shot-frame">
+                            <img src="assets/admin-reports/step-05-hours-by-activity-results.png"
+                                alt="Hours by Activity results grouped by category with totals">
+                            <span class="callout" style="--x: 55%; --y: 72%;">By activity</span>
+                        </div>
+                    </div>
+                    <p class="aside">
+                        <strong>Other useful reports:</strong>
+                        <em>Activity Hours by Volunteer</em> — who logged on one chosen activity;
+                        <em>Category Hours by Volunteer</em> — who logged in one category;
+                        <em>Hours by Category</em> — category roll-up with charts.
+                    </p>
+                </div>
+            </section>
+
+            <section class="step">
+                <div class="step-num" aria-hidden="true">4</div>
+                <h3 class="step-title">Logged Hours Raw Data (detailed export)</h3>
+                <div class="step-body">
+                    <p>
+                        For line-by-line entries (date, hours, activity, volunteer), open
+                        <strong>Logged Hours Raw Data</strong>. Filter by Date Volunteered and/or
+                        Date Created, Category (e.g. In-Person), and Sort. Choose Excel / CSV for export.
+                    </p>
+                    <p>
+                        Under <strong>Columns to Include</strong>, tick the fields you need
+                        (DateVolunteered, HoursWorked, ActivityName, FirstName, LastName, and so on).
+                        Then <strong>View Logged Hours</strong> or <strong>Export Logged Hours</strong>.
+                    </p>
+                    <div class="shot">
+                        <div class="shot-frame">
+                            <img src="assets/admin-reports/step-06-logged-hours-raw-data.png"
+                                alt="Logged Hours Raw Data settings with date range category and columns">
+                            <span class="callout" style="--x: 48%; --y: 32%;">Filters + columns</span>
+                        </div>
+                    </div>
+                    <p>
+                        On-screen Results show each entry; use the Columns / Filters tabs on the right
+                        to refine the grid further before export.
+                    </p>
+                    <div class="shot">
+                        <div class="shot-frame">
+                            <img src="assets/admin-reports/step-07-raw-data-results.png"
+                                alt="Logged Hours Raw Data results grid with date hours activity and volunteer">
+                            <span class="callout" style="--x: 55%; --y: 55%;">Entry-level rows</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="step">
+                <div class="step-num" aria-hidden="true">5</div>
+                <h3 class="step-title">Filter who is included (specific group)</h3>
+                <div class="step-body">
+                    <p>
+                        Most hours reports default to everyone. Click
+                        <strong>Report on a specific group</strong> to limit by volunteer status
+                        (for example Accepted only), email presence, and extra search criteria
+                        (qualifications, date joined, custom fields, and so on).
+                    </p>
+                    <p>
+                        You can <strong>Load a saved search</strong>, <strong>Add Search Criteria</strong>,
+                        then <strong>Search</strong>. Switch back with <strong>Report on everyone</strong>
+                        when you want the full population again.
+                    </p>
+                    <div class="shot">
+                        <div class="shot-frame">
+                            <img src="assets/admin-reports/step-08-report-specific-group.png"
+                                alt="Report on a specific group with volunteer status checkboxes and search">
+                            <span class="callout" style="--x: 48%; --y: 42%;">Status filters</span>
+                        </div>
+                    </div>
+                    <p class="aside">
+                        Unapproved hours do not appear in reports — approve pending hours first if totals
+                        look low. You can also Save This Report / My Saved Reports to reuse settings.
+                    </p>
+                </div>
+            </section>
+
+        </div>
+
+        <aside class="help-block">
+            <h3>Encountering issues?</h3>
+            <p>
+                Confirm you are in JA Africa Volunteer University (or the correct country org).
+                Check the date range and that hours are approved. If a volunteer is missing, try
+                Report on everyone or widen statuses under Report on a specific group.
+                Contact the Digital team if exports fail or enterprise-wide totals are needed.
+            </p>
+        </aside>
+    </article>
+
+    <footer class="page-footer">
+        Project DeJAVU · JA Africa Regional Volunteer Platform ·
+        <a href="index.html">Back to guides</a>
+    </footer>
+
+</body>
+
+</html>
