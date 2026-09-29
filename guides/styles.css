@@ -10,6 +10,9 @@
     --pure-white: #FFFFFF;
     --body-muted: #4a5a62;
     --page-max: 820px;
+    /* Screenshot markers — red by default; .dark uses black */
+    --mark: #c1121f;
+    --mark-dark: #1a1a1a;
 }
 
 * {
@@ -241,20 +244,20 @@ h1, h2, h3 {
     font-size: 0.72rem;
     line-height: 1.25;
     text-align: center;
-    color: var(--immersive-blue-black);
-    background: rgba(194, 237, 240, 0.95);
-    border: 2px solid var(--resilient-turquoise);
+    color: #1a1a1a;
+    background: rgba(255, 255, 255, 0.95);
+    border: 2px solid var(--mark);
     border-radius: 6px;
     padding: 6px 8px;
-    box-shadow: 0 2px 8px rgba(34, 64, 77, 0.12);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
     pointer-events: none;
     z-index: 2;
 }
 
 .callout.dark {
-    background: rgba(34, 64, 77, 0.92);
+    background: rgba(20, 20, 20, 0.92);
     color: var(--pure-white);
-    border-color: var(--immersive-blue-black);
+    border-color: var(--mark-dark);
 }
 
 .callout::after {
@@ -264,22 +267,22 @@ h1, h2, h3 {
     bottom: -10px;
     transform: translateX(-50%);
     border: 5px solid transparent;
-    border-top-color: var(--resilient-turquoise);
+    border-top-color: var(--mark);
 }
 
 .callout.dark::after {
-    border-top-color: var(--immersive-blue-black);
+    border-top-color: var(--mark-dark);
 }
 
 .callout.point-up::after {
     bottom: auto;
     top: -10px;
     border-top-color: transparent;
-    border-bottom-color: var(--resilient-turquoise);
+    border-bottom-color: var(--mark);
 }
 
 .callout.dark.point-up::after {
-    border-bottom-color: var(--immersive-blue-black);
+    border-bottom-color: var(--mark-dark);
 }
 
 .callout-list {
@@ -299,6 +302,53 @@ h1, h2, h3 {
 .callout-list span::before {
     content: '→ ';
     color: var(--resilient-turquoise);
+}
+
+/* Shape overlays on screenshots — position with --x, --y, --w, --h (% of frame) */
+.mark-rect {
+    position: absolute;
+    left: var(--x, 10%);
+    top: var(--y, 10%);
+    width: var(--w, 20%);
+    height: var(--h, 12%);
+    transform: translate(-50%, -50%);
+    border: 3px solid var(--mark);
+    border-radius: 4px;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.7);
+    pointer-events: none;
+    z-index: 1;
+}
+
+.mark-rect.dark {
+    border-color: var(--mark-dark);
+}
+
+.mark-circle {
+    position: absolute;
+    left: var(--x, 50%);
+    top: var(--y, 50%);
+    width: var(--d, 14%);
+    height: var(--d, 14%);
+    transform: translate(-50%, -50%);
+    border: 3px solid var(--mark);
+    border-radius: 50%;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.7);
+    pointer-events: none;
+    z-index: 1;
+}
+
+.mark-circle.dark {
+    border-color: var(--mark-dark);
+}
+
+.mark-circle.teal {
+    border-color: var(--mark);
+}
+
+/* Wide, short ellipse — set --w and --h (% of frame) */
+.mark-circle.oval {
+    width: var(--w, 16%);
+    height: var(--h, 6%);
 }
 
 /* ── Closing / help block ── */
@@ -427,6 +477,8 @@ h1, h2, h3 {
 
     .shot,
     .callout,
+    .mark-rect,
+    .mark-circle,
     .aside,
     .guide-header,
     .step-num {
